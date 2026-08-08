@@ -4,7 +4,7 @@ import { Store, Plus } from 'lucide-react'
 import { api } from '../data/api'
 import { salesReps } from '../data/salesReps'
 import { orders } from '../data/orders'
-import { receivables } from '../data/ar'
+import { getReceivables } from '../data/ar'
 import { useAppStore } from '../store/useAppStore'
 import DataTable from '../components/common/DataTable'
 import Switch from '../components/common/Switch'
@@ -23,6 +23,7 @@ export default function OutletPage() {
   const [addOpen, setAddOpen] = useState(false)
 
   useEffect(() => {
+    const receivables = getReceivables()
     api.getOutlets().then((rows) => {
       setOutlets(
         rows.map((o) => {

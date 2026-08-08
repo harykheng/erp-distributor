@@ -18,15 +18,19 @@ export default function Badge({ children, variant = 'default', dot = false, clas
 }
 
 export const statusVariant = {
+  diajukan: 'warn',
   draft: 'default',
   diproses: 'warn',
   dikirim: 'brand',
   lunas: 'good',
+  ditolak: 'bad',
 }
 
 export const statusLabel = {
+  diajukan: 'Menunggu Verifikasi',
   draft: 'Draft',
   diproses: 'Diproses',
   dikirim: 'Dikirim',
   lunas: 'Lunas',
+  ditolak: 'Ditolak',
 }

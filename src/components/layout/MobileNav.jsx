@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { LayoutDashboard, ShoppingCart, Wallet, Warehouse, Users, MoreHorizontal, Store, FileBarChart, Settings, X } from 'lucide-react'
+import { LayoutDashboard, ShoppingCart, Wallet, Warehouse, Users, MoreHorizontal, Store, FileBarChart, Settings, Send, X } from 'lucide-react'
 
 const items = [
   { to: '/', label: 'Home', icon: LayoutDashboard, end: true },
@@ -13,6 +13,7 @@ const items = [
 
 const moreItems = [
   { to: '/outlet', label: 'Outlet / Customer', icon: Store },
+  { to: '/sales-portal', label: 'Portal Sales', icon: Send },
   { to: '/laporan', label: 'Laporan', icon: FileBarChart },
   { to: '/settings', label: 'Settings', icon: Settings },
 ]

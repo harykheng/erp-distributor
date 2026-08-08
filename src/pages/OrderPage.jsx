@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Plus, Truck, Eye, Printer, FileText, MessageCircle } from 'lucide-react'
+import { Plus, Truck, Eye, Printer, FileText, MessageCircle, CheckCircle2, XCircle, Send } from 'lucide-react'
 import { api } from '../data/api'
 import { outlets } from '../data/outlets'
 import { salesReps } from '../data/salesReps'
@@ -20,6 +20,7 @@ function repName(id) {
 
 export default function OrderPage() {
   const dataVersion = useAppStore((s) => s.dataVersion)
+  const bumpDataVersion = useAppStore((s) => s.bumpDataVersion)
   const openOrderDrawer = useAppStore((s) => s.openOrderDrawer)
   const [orders, setOrders] = useState([])
   const [statusFilter, setStatusFilter] = useState('semua')
@@ -30,6 +31,12 @@ export default function OrderPage() {
       setOrders(rows.map((o) => ({ ...o, outletNama: outletName(o.outletId), repNama: repName(o.salesRepId) })))
     )
   }, [dataVersion])
+
+  async function handleVerify(orderId, approve) {
+    await api.verifyOrderRequest(orderId, approve)
+    bumpDataVersion()
+    setDetail(null)
+  }
 
   const filtered = useMemo(() => {
     if (statusFilter === 'semua') return orders
@@ -57,12 +64,36 @@ export default function OrderPage() {
       key: 'action',
       label: '',
       render: (r) => (
-        <button
-          onClick={() => setDetail(r)}
-          className="flex items-center gap-1.5 text-xs text-brand font-semibold hover:underline"
-        >
-          <Eye size={13} /> Detail
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setDetail(r)}
+            className="flex items-center gap-1.5 text-xs text-brand font-semibold hover:underline"
+          >
+            <Eye size={13} /> Detail
+          </button>
+          {r.status === 'diajukan' && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleVerify(r.id, true)
+                }}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-good/10 text-good text-xs font-semibold hover:bg-good/20"
+              >
+                <CheckCircle2 size={13} /> Verifikasi
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleVerify(r.id, false)
+                }}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-bad/10 text-bad text-xs font-semibold hover:bg-bad/20"
+              >
+                <XCircle size={13} /> Tolak
+              </button>
+            </>
+          )}
+        </div>
       ),
     },
   ]
@@ -99,6 +130,12 @@ export default function OrderPage() {
       <Modal open={!!detail} onClose={() => setDetail(null)} title={detail?.nomor} width="max-w-lg">
         {detail && (
           <div className="space-y-4">
+            {detail.sumber === 'sales' && (
+              <div className="flex items-center gap-2 bg-warn/10 text-warn text-xs font-semibold rounded-lg px-3 py-2.5">
+                <Send size={14} /> Diajukan oleh {detail.repNama}
+                {detail.catatan ? ` — "${detail.catatan}"` : ''}
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-3 text-sm">
               <InfoRow label="Outlet" value={detail.outletNama} />
               <InfoRow label="Sales Rep" value={detail.repNama} />
@@ -127,29 +164,47 @@ export default function OrderPage() {
                 <Truck size={14} /> Surat jalan {detail.suratJalanNumber} sudah diterbitkan
               </div>
             )}
-            <div className="flex flex-wrap gap-2 border-t border-base-800 pt-4">
-              <button
-                onClick={() => printInvoice(detail, outlets.find((o) => o.id === detail.outletId))}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-base-700 bg-base-850 text-xs font-semibold text-base-200 hover:bg-base-800"
-              >
-                <Printer size={13} /> Print Invoice
-              </button>
-              <button
-                onClick={() => printSuratJalan(detail, outlets.find((o) => o.id === detail.outletId))}
-                disabled={!detail.suratJalanNumber}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-base-700 bg-base-850 text-xs font-semibold text-base-200 hover:bg-base-800 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <FileText size={13} /> Print Surat Jalan
-              </button>
-              <a
-                href={orderWaLink(detail)}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-good/10 text-good text-xs font-semibold hover:bg-good/20"
-              >
-                <MessageCircle size={13} /> Kirim WhatsApp
-              </a>
-            </div>
+
+            {detail.status === 'diajukan' ? (
+              <div className="flex gap-2 border-t border-base-800 pt-4">
+                <button
+                  onClick={() => handleVerify(detail.id, true)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-good/10 text-good text-sm font-bold hover:bg-good/20"
+                >
+                  <CheckCircle2 size={15} /> Verifikasi & Kirim
+                </button>
+                <button
+                  onClick={() => handleVerify(detail.id, false)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-bad/10 text-bad text-sm font-bold hover:bg-bad/20"
+                >
+                  <XCircle size={15} /> Tolak
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2 border-t border-base-800 pt-4">
+                <button
+                  onClick={() => printInvoice(detail, outlets.find((o) => o.id === detail.outletId))}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-base-700 bg-base-850 text-xs font-semibold text-base-200 hover:bg-base-800"
+                >
+                  <Printer size={13} /> Print Invoice
+                </button>
+                <button
+                  onClick={() => printSuratJalan(detail, outlets.find((o) => o.id === detail.outletId))}
+                  disabled={!detail.suratJalanNumber}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-base-700 bg-base-850 text-xs font-semibold text-base-200 hover:bg-base-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <FileText size={13} /> Print Surat Jalan
+                </button>
+                <a
+                  href={orderWaLink(detail)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-good/10 text-good text-xs font-semibold hover:bg-good/20"
+                >
+                  <MessageCircle size={13} /> Kirim WhatsApp
+                </a>
+              </div>
+            )}
           </div>
         )}
       </Modal>

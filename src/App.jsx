@@ -6,6 +6,7 @@ import PiutangPage from './pages/PiutangPage'
 import OutletPage from './pages/OutletPage'
 import OutletDetailPage from './pages/OutletDetailPage'
 import SalesRepPage from './pages/SalesRepPage'
+import SalesPortalPage from './pages/SalesPortalPage'
 import InventoryPage from './pages/InventoryPage'
 import LaporanPage from './pages/LaporanPage'
 import SettingsPage from './pages/SettingsPage'
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/outlet" element={<OutletPage />} />
         <Route path="/outlet/:id" element={<OutletDetailPage />} />
         <Route path="/sales-rep" element={<SalesRepPage />} />
+        <Route path="/sales-portal" element={<SalesPortalPage />} />
         <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/laporan" element={<LaporanPage />} />
         <Route path="/settings" element={<SettingsPage />} />

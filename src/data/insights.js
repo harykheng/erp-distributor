@@ -1,4 +1,4 @@
-import { receivables } from './ar'
+import { getReceivables } from './ar'
 import { orders, TODAY } from './orders'
 import { outlets } from './outlets'
 import { products, isProductCritical } from './products'
@@ -8,6 +8,7 @@ import { daysBetween } from '../lib/format'
 
 function buildInsights() {
   const insights = []
+  const receivables = getReceivables()
 
   // 1. Piutang jatuh tempo minggu ini (0-7 hari ke depan, belum overdue)
   const dueThisWeek = receivables.filter((r) => {
@@ -81,10 +82,26 @@ function buildInsights() {
     })
   }
 
+  // 5. Order request dari sales yang menunggu verifikasi
+  const pendingRequests = orders.filter((o) => o.status === 'diajukan')
+  if (pendingRequests.length > 0) {
+    insights.push({
+      id: 'ins-pending-requests',
+      type: 'warning',
+      title: 'Order Menunggu Verifikasi',
+      message: `${pendingRequests.length} order dari sales rep menunggu diverifikasi sebelum dikirim.`,
+      link: '/order',
+    })
+  }
+
   return insights
 }
 
-export const insights = buildInsights()
+// dihitung ulang tiap dipanggil (bukan cache statis) supaya ikut ter-update
+// saat ada order/piutang baru dalam sesi yang sama
+export function getInsights() {
+  return buildInsights()
+}
 
 export function totalOutletAktif() {
   return outlets.filter((o) => o.aktif).length

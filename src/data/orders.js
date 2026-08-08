@@ -19,7 +19,7 @@ function isoDate(d) {
   return d.toISOString().slice(0, 10)
 }
 
-export const statusFlow = ['draft', 'diproses', 'dikirim', 'lunas']
+export const statusFlow = ['diajukan', 'draft', 'diproses', 'dikirim', 'lunas', 'ditolak']
 
 const termOptions = [7, 14, 30]
 
@@ -97,6 +97,73 @@ for (let i = 0; i < totalOrders; i++) {
     jatuhTempo: isoDate(jatuhTempo),
     dibayar,
     isSent,
+    sumber: 'admin',
+    catatan: '',
+  })
+}
+
+// beberapa permintaan order dari sales yang masih menunggu verifikasi admin,
+// supaya alur verifikasi langsung kelihatan isinya saat demo
+const catatanContoh = [
+  'Outlet minta tambahan stok buat weekend',
+  'Ada promo akhir bulan, outlet order lebih banyak dari biasanya',
+  'Outlet baru buka, order perdana',
+  'Stok outlet menipis, minta dikirim cepat',
+  '',
+]
+
+const pendingRequestCount = 5
+for (let i = 0; i < pendingRequestCount; i++) {
+  const daysAgo = rng.int(0, 2)
+  const tanggal = addDays(TODAY, -daysAgo)
+  const outlet = rng.pick(outlets.filter((o) => o.aktif))
+  const warehouse = rng.pick(warehouses)
+  const itemCount = rng.int(2, 4)
+  const usedProductIds = new Set()
+  const items = []
+  let total = 0
+
+  for (let j = 0; j < itemCount; j++) {
+    let product = rng.pick(products)
+    let guard = 0
+    while (usedProductIds.has(product.id) && guard < 10) {
+      product = rng.pick(products)
+      guard++
+    }
+    usedProductIds.add(product.id)
+    const qty = rng.pick([2, 3, 5, 8, 10])
+    const subtotal = qty * product.harga
+    total += subtotal
+    items.push({
+      productId: product.id,
+      nama: product.nama,
+      satuan: product.satuan,
+      qty,
+      hargaSatuan: product.harga,
+      subtotal,
+    })
+  }
+
+  const termin = rng.pick(termOptions)
+  const jatuhTempo = addDays(tanggal, termin)
+
+  orders.push({
+    id: `order-pending-${i + 1}`,
+    nomor: `ORD-2026-${String(orderCounter++).padStart(4, '0')}`,
+    tanggal: isoDate(tanggal),
+    outletId: outlet.id,
+    salesRepId: outlet.salesRepId,
+    warehouseId: warehouse.id,
+    items,
+    total,
+    status: 'diajukan',
+    suratJalanNumber: null,
+    termin,
+    jatuhTempo: isoDate(jatuhTempo),
+    dibayar: 0,
+    isSent: false,
+    sumber: 'sales',
+    catatan: rng.pick(catatanContoh),
   })
 }
 
@@ -124,8 +191,51 @@ export function createOrder({ outletId, salesRepId, warehouseId, items, termin =
     jatuhTempo: isoDate(jatuhTempo),
     dibayar: 0,
     isSent: true,
+    sumber: 'admin',
+    catatan: '',
   }
   orders.unshift(order)
+  return order
+}
+
+// order request dari sales rep — masuk sebagai 'diajukan', menunggu admin verifikasi
+export function requestOrder({ outletId, salesRepId, warehouseId, items, termin = 7, catatan = '' }) {
+  const total = items.reduce((s, it) => s + it.subtotal, 0)
+  const tanggal = new Date()
+  const jatuhTempo = addDays(tanggal, termin)
+  const order = {
+    id: `order-runtime-${runtimeOrderSeq}`,
+    nomor: `ORD-2026-${String(runtimeOrderSeq++).padStart(4, '0')}`,
+    tanggal: isoDate(tanggal),
+    outletId,
+    salesRepId,
+    warehouseId,
+    items,
+    total,
+    status: 'diajukan',
+    suratJalanNumber: null,
+    termin,
+    jatuhTempo: isoDate(jatuhTempo),
+    dibayar: 0,
+    isSent: false,
+    sumber: 'sales',
+    catatan,
+  }
+  orders.unshift(order)
+  return order
+}
+
+// admin verifikasi order request: setuju -> langsung dikirim + surat jalan terbit, tolak -> ditolak
+export function verifyOrderRequest(orderId, approve) {
+  const order = orders.find((o) => o.id === orderId)
+  if (!order) return null
+  if (approve) {
+    order.status = 'dikirim'
+    order.suratJalanNumber = `SJ-2026-${String(runtimeSjSeq++).padStart(4, '0')}`
+    order.isSent = true
+  } else {
+    order.status = 'ditolak'
+  }
   return order
 }
 
