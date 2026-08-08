@@ -61,7 +61,7 @@ function ProfilBisnis() {
         <Field label="Email" defaultValue="admin@sumbermakmur.co.id" />
         <Field label="Termin Default" defaultValue="14 hari" />
       </div>
-      <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand text-base-950 text-sm font-bold hover:bg-brand-400">
+      <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand text-ink text-sm font-bold hover:bg-brand-400">
         <Save size={15} /> Simpan Perubahan
       </button>
     </div>
@@ -95,7 +95,7 @@ function DaftarSales() {
         {salesReps.map((r) => (
           <div key={r.id} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-base-850 border border-base-800">
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-base-950 shrink-0"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-ink shrink-0"
               style={{ backgroundColor: r.fotoWarna }}
             >
               {r.inisial}

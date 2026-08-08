@@ -41,7 +41,7 @@ export default function SalesRepPage() {
                 {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
               </div>
               <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-base-950 shrink-0"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-ink shrink-0"
                 style={{ backgroundColor: rep.fotoWarna }}
               >
                 {rep.inisial}

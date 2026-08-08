@@ -81,7 +81,7 @@ export default function OrderPage() {
         </div>
         <button
           onClick={openOrderDrawer}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-brand text-base-950 text-sm font-bold hover:bg-brand-400 shadow-card"
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-brand text-ink text-sm font-bold hover:bg-brand-400 shadow-card"
         >
           <Plus size={16} strokeWidth={2.5} /> Order Baru
         </button>
