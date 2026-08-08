@@ -93,6 +93,43 @@ export function printInvoice(order, outlet) {
   openPrintWindow(html)
 }
 
+export function printReport({ title, subtitle, headers, rows, totalLabel, totalValue }) {
+  const theadHtml = headers.map((h) => `<th>${h}</th>`).join('')
+  const rowsHtml = rows
+    .map((row) => `<tr>${row.map((cell, i) => `<td class="${i > 0 ? 'text-right' : ''}">${cell}</td>`).join('')}</tr>`)
+    .join('')
+  const totalHtml =
+    totalLabel && totalValue
+      ? `<tr class="total-row"><td colspan="${headers.length - 1}" class="text-right">${totalLabel}</td><td class="text-right">${totalValue}</td></tr>`
+      : ''
+
+  const html = `
+    <html>
+      <head><title>${title}</title>${baseStyles()}</head>
+      <body>
+        <div class="header-row">
+          <div>
+            <h1>${COMPANY.nama}</h1>
+            <div class="muted">${COMPANY.alamat}<br/>${COMPANY.telepon}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="doc-title">${title}</div>
+            <div class="muted">${subtitle || ''}</div>
+          </div>
+        </div>
+        <table>
+          <thead><tr>${theadHtml}</tr></thead>
+          <tbody>
+            ${rowsHtml}
+            ${totalHtml}
+          </tbody>
+        </table>
+      </body>
+    </html>
+  `
+  openPrintWindow(html)
+}
+
 export function printSuratJalan(order, outlet) {
   const rows = order.items
     .map(
