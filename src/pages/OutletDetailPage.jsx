@@ -5,7 +5,7 @@ import { api } from '../data/api'
 import { salesReps } from '../data/salesReps'
 import { useAppStore } from '../store/useAppStore'
 import KpiCard from '../components/common/KpiCard'
-import { statusVariant, statusLabel } from '../components/common/Badge'
+import Badge, { statusVariant, statusLabel } from '../components/common/Badge'
 import Switch from '../components/common/Switch'
 import { formatRupiah, formatDate } from '../lib/format'
 
