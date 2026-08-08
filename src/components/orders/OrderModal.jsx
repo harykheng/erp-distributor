@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Search, Store, Plus, Minus, Trash2, Truck, CheckCircle2, X, Sparkles } from 'lucide-react'
-import Drawer from '../common/Drawer'
+import Modal from '../common/Modal'
 import { useAppStore } from '../../store/useAppStore'
 import { outlets } from '../../data/outlets'
 import { products } from '../../data/products'
@@ -10,7 +10,7 @@ import { outletProductAverages } from '../../data/orders'
 import { api } from '../../data/api'
 import { formatRupiah } from '../../lib/format'
 
-export default function OrderDrawer() {
+export default function OrderModal() {
   const open = useAppStore((s) => s.orderDrawerOpen)
   const close = useAppStore((s) => s.closeOrderDrawer)
   const bumpDataVersion = useAppStore((s) => s.bumpDataVersion)
@@ -66,7 +66,8 @@ export default function OrderDrawer() {
   const total = cartItems.reduce((s, it) => s + it.subtotal, 0)
 
   function setQty(productId, qty) {
-    setCart((c) => ({ ...c, [productId]: Math.max(0, qty) }))
+    const clean = Number.isFinite(qty) ? Math.max(0, Math.floor(qty)) : 0
+    setCart((c) => ({ ...c, [productId]: clean }))
   }
   function addSuggested(productId) {
     const suggestedQty = averages[productId]?.avgQty || 1
@@ -100,17 +101,18 @@ export default function OrderDrawer() {
   }
 
   return (
-    <Drawer
+    <Modal
       open={open}
       onClose={close}
       title="Order Baru"
       subtitle="Cari outlet, tambah produk, langsung jadi surat jalan"
-      width="max-w-3xl"
+      width="max-w-2xl"
+      bodyClassName="p-0"
     >
       {success ? (
         <SuccessView order={success} outlet={selectedOutlet} onClose={close} onNew={() => setSuccess(null)} />
       ) : (
-        <div className="flex flex-col h-full">
+        <div>
           <div className="p-5 border-b border-base-800 space-y-3">
             <label className="text-xs font-semibold text-base-400 uppercase tracking-wide">Outlet Tujuan</label>
             {selectedOutlet ? (
@@ -196,7 +198,13 @@ export default function OrderDrawer() {
                             >
                               <Minus size={13} />
                             </button>
-                            <span className="w-8 text-center text-sm font-semibold text-base-100">{qty}</span>
+                            <input
+                              type="number"
+                              min="0"
+                              value={qty}
+                              onChange={(e) => setQty(p.id, parseInt(e.target.value, 10))}
+                              className="w-12 text-center bg-base-800 border border-base-700 rounded-md text-sm font-semibold text-base-100 py-1 focus:outline-none focus:ring-1 focus:ring-brand/60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
                             <button
                               onClick={() => setQty(p.id, qty + 1)}
                               className="w-7 h-7 flex items-center justify-center rounded-md bg-base-800 text-base-300 hover:bg-base-700"
@@ -225,7 +233,7 @@ export default function OrderDrawer() {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-5">
+              <div className="p-5 border-b border-base-800">
                 <div className="text-xs font-semibold text-base-400 uppercase tracking-wide mb-2">
                   Keranjang ({cartItems.length})
                 </div>
@@ -237,14 +245,19 @@ export default function OrderDrawer() {
                   <div className="space-y-1.5">
                     {cartItems.map((it) => (
                       <div key={it.product.id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-base-850">
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className="text-sm text-base-200 truncate">{it.product.nama}</div>
-                          <div className="text-xs text-base-500">
-                            {it.qty} {it.product.satuan} &times; {formatRupiah(it.product.harga)}
-                          </div>
+                          <div className="text-xs text-base-500">{formatRupiah(it.product.harga)} / {it.product.satuan}</div>
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
-                          <span className="text-sm font-semibold text-base-100">{formatRupiah(it.subtotal)}</span>
+                          <input
+                            type="number"
+                            min="0"
+                            value={it.qty}
+                            onChange={(e) => setQty(it.product.id, parseInt(e.target.value, 10))}
+                            className="w-14 text-center bg-base-800 border border-base-700 rounded-md text-sm font-semibold text-base-100 py-1 focus:outline-none focus:ring-1 focus:ring-brand/60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                          <span className="text-sm font-semibold text-base-100 w-24 text-right">{formatRupiah(it.subtotal)}</span>
                           <button onClick={() => setQty(it.product.id, 0)} className="text-base-500 hover:text-bad">
                             <Trash2 size={14} />
                           </button>
@@ -270,7 +283,7 @@ export default function OrderDrawer() {
                 </div>
               </div>
 
-              <div className="p-5 border-t border-base-800 bg-base-900">
+              <div className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm text-base-400">Total Order</span>
                   <span className="text-xl font-extrabold text-base-100">{formatRupiah(total)}</span>
@@ -288,7 +301,7 @@ export default function OrderDrawer() {
           )}
         </div>
       )}
-    </Drawer>
+    </Modal>
   )
 }
 
@@ -297,7 +310,7 @@ function SuccessView({ order, outlet, onClose, onNew }) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center justify-center h-full p-8 text-center"
+      className="flex flex-col items-center justify-center p-8 text-center"
     >
       <div className="w-16 h-16 rounded-full bg-good/10 text-good flex items-center justify-center mb-4">
         <CheckCircle2 size={32} />

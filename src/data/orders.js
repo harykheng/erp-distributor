@@ -2,6 +2,8 @@ import { makeRng } from './rng'
 import { outlets } from './outlets'
 import { products } from './products'
 import { warehouses } from './warehouses'
+import { formatRupiah, formatDate } from '../lib/format'
+import { waLink } from '../lib/whatsapp'
 
 const rng = makeRng(303)
 
@@ -157,4 +159,19 @@ export function outletProductAverages(outletId) {
     result[pid] = { avgQty: avg, count: v.qtys.length, nama: v.nama, satuan: v.satuan }
   })
   return result
+}
+
+export function orderWaLink(order) {
+  const outlet = outlets.find((o) => o.id === order.outletId)
+  const lines = [
+    `Halo ${outlet?.nama || ''}, berikut detail pesanan Anda:`,
+    ``,
+    `No. Order: ${order.nomor}`,
+    order.suratJalanNumber ? `Surat Jalan: ${order.suratJalanNumber}` : null,
+    `Tanggal: ${formatDate(order.tanggal)}`,
+    `Total: ${formatRupiah(order.total)}`,
+    ``,
+    `Terima kasih atas pesanannya! 🙏`,
+  ].filter(Boolean)
+  return waLink(outlet?.telepon, lines.join('\n'))
 }
