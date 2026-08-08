@@ -27,7 +27,7 @@ export default function Sidebar() {
     <aside className="hidden md:flex md:w-64 shrink-0 flex-col border-r border-base-800 bg-base-900/60 backdrop-blur-sm">
       <div className="flex items-center gap-2.5 px-5 h-16 border-b border-base-800">
         <div className="w-8 h-8 rounded-lg bg-brand flex items-center justify-center shrink-0">
-          <Boxes size={18} className="text-base-950" strokeWidth={2.5} />
+          <Boxes size={18} className="text-ink" strokeWidth={2.5} />
         </div>
         <div className="leading-tight">
           <div className="font-extrabold text-base-100 text-sm">Harel ERP</div>

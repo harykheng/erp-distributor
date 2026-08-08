@@ -1,9 +1,33 @@
 import { create } from 'zustand'
 
+function getInitialTheme() {
+  if (typeof window === 'undefined') return 'dark'
+  const saved = window.localStorage.getItem('harel-theme')
+  if (saved === 'light' || saved === 'dark') return saved
+  return window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+}
+
+function applyTheme(theme) {
+  if (typeof document === 'undefined') return
+  document.documentElement.setAttribute('data-theme', theme)
+  window.localStorage.setItem('harel-theme', theme)
+}
+
+const initialTheme = getInitialTheme()
+applyTheme(initialTheme)
+
 export const useAppStore = create((set) => ({
-  mode: 'simple', // 'simple' | 'power'
-  toggleMode: () => set((s) => ({ mode: s.mode === 'simple' ? 'power' : 'simple' })),
-  setMode: (mode) => set({ mode }),
+  theme: initialTheme,
+  toggleTheme: () =>
+    set((s) => {
+      const next = s.theme === 'dark' ? 'light' : 'dark'
+      applyTheme(next)
+      return { theme: next }
+    }),
+  setTheme: (theme) => {
+    applyTheme(theme)
+    set({ theme })
+  },
 
   commandPaletteOpen: false,
   openCommandPalette: () => set({ commandPaletteOpen: true }),

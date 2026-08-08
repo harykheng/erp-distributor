@@ -1,5 +1,5 @@
 import { Search, Bell, Plus } from 'lucide-react'
-import ModeToggle from '../common/ModeToggle'
+import ThemeToggle from '../common/ThemeToggle'
 import { useAppStore } from '../../store/useAppStore'
 
 export default function Topbar({ title, subtitle }) {
@@ -34,10 +34,10 @@ export default function Topbar({ title, subtitle }) {
           <Bell size={16} />
           <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-brand" />
         </button>
-        <ModeToggle />
+        <ThemeToggle />
         <button
           onClick={openOrderDrawer}
-          className="flex items-center gap-1.5 px-3 md:px-4 py-2 rounded-lg bg-brand text-base-950 text-sm font-bold hover:bg-brand-400 transition-colors shadow-card"
+          className="flex items-center gap-1.5 px-3 md:px-4 py-2 rounded-lg bg-brand text-ink text-sm font-bold hover:bg-brand-400 transition-colors shadow-card"
         >
           <Plus size={16} strokeWidth={2.5} />
           <span className="hidden sm:inline">Order Baru</span>

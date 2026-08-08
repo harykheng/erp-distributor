@@ -113,7 +113,7 @@ export default function LaporanPage() {
           <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-base-700 bg-base-900 text-xs font-semibold text-base-300 hover:bg-base-850">
             <FileText size={14} /> Export PDF
           </button>
-          <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand text-base-950 text-xs font-bold hover:bg-brand-400">
+          <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand text-ink text-xs font-bold hover:bg-brand-400">
             <Download size={14} /> Download
           </button>
         </div>

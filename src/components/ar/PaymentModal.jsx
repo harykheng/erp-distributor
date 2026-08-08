@@ -59,7 +59,7 @@ export default function PaymentModal({ receivable, onClose }) {
           <button
             onClick={handleSubmit}
             disabled={submitting || amount <= 0}
-            className="w-full py-2.5 rounded-lg bg-brand text-base-950 font-bold text-sm hover:bg-brand-400 disabled:opacity-40"
+            className="w-full py-2.5 rounded-lg bg-brand text-ink font-bold text-sm hover:bg-brand-400 disabled:opacity-40"
           >
             {submitting ? 'Menyimpan...' : 'Simpan Pembayaran'}
           </button>

@@ -278,7 +278,7 @@ export default function OrderDrawer() {
                 <button
                   onClick={handleSubmit}
                   disabled={cartItems.length === 0 || submitting}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-brand text-base-950 font-bold hover:bg-brand-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-brand text-ink font-bold hover:bg-brand-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   <Truck size={17} strokeWidth={2.5} />
                   {submitting ? 'Memproses...' : 'Buat Order & Surat Jalan'}
@@ -317,7 +317,7 @@ function SuccessView({ order, outlet, onClose, onNew }) {
         <button onClick={onNew} className="px-4 py-2.5 rounded-lg border border-base-700 text-sm font-semibold text-base-200 hover:bg-base-800">
           Buat Order Lagi
         </button>
-        <button onClick={onClose} className="px-4 py-2.5 rounded-lg bg-brand text-base-950 text-sm font-bold hover:bg-brand-400">
+        <button onClick={onClose} className="px-4 py-2.5 rounded-lg bg-brand text-ink text-sm font-bold hover:bg-brand-400">
           Selesai
         </button>
       </div>
