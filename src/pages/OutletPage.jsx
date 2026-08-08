@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Store } from 'lucide-react'
+import { Store, Plus } from 'lucide-react'
 import { api } from '../data/api'
 import { salesReps } from '../data/salesReps'
 import { orders } from '../data/orders'
 import { receivables } from '../data/ar'
+import { useAppStore } from '../store/useAppStore'
 import DataTable from '../components/common/DataTable'
-import Badge from '../components/common/Badge'
+import Switch from '../components/common/Switch'
+import AddOutletModal from '../components/outlets/AddOutletModal'
 import { formatRupiah, formatDate } from '../lib/format'
 
 function repName(id) {
@@ -15,7 +17,10 @@ function repName(id) {
 
 export default function OutletPage() {
   const navigate = useNavigate()
+  const dataVersion = useAppStore((s) => s.dataVersion)
+  const bumpDataVersion = useAppStore((s) => s.bumpDataVersion)
   const [outlets, setOutlets] = useState([])
+  const [addOpen, setAddOpen] = useState(false)
 
   useEffect(() => {
     api.getOutlets().then((rows) => {
@@ -34,7 +39,12 @@ export default function OutletPage() {
         })
       )
     })
-  }, [])
+  }, [dataVersion])
+
+  async function handleToggleStatus(outletId, aktif) {
+    await api.setOutletStatus(outletId, aktif)
+    bumpDataVersion()
+  }
 
   const columns = useMemo(
     () => [
@@ -72,7 +82,14 @@ export default function OutletPage() {
       {
         key: 'aktif',
         label: 'Status',
-        render: (r) => <Badge variant={r.aktif ? 'good' : 'default'} dot>{r.aktif ? 'Aktif' : 'Nonaktif'}</Badge>,
+        render: (r) => (
+          <div className="flex items-center gap-2">
+            <Switch checked={r.aktif} onChange={(next) => handleToggleStatus(r.id, next)} />
+            <span className={`text-xs font-semibold ${r.aktif ? 'text-good' : 'text-base-500'}`}>
+              {r.aktif ? 'Aktif' : 'Nonaktif'}
+            </span>
+          </div>
+        ),
       },
     ],
     []
@@ -80,6 +97,15 @@ export default function OutletPage() {
 
   return (
     <div className="space-y-5">
+      <div className="flex items-center justify-end">
+        <button
+          onClick={() => setAddOpen(true)}
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-brand text-ink text-sm font-bold hover:bg-brand-400 shadow-card"
+        >
+          <Plus size={16} strokeWidth={2.5} /> Tambah Outlet
+        </button>
+      </div>
+
       <DataTable
         columns={columns}
         data={outlets}
@@ -91,6 +117,15 @@ export default function OutletPage() {
         toolbarRight={<span className="text-xs text-base-500">{outlets.length} outlet terdaftar</span>}
       />
       <div className="text-xs text-base-500">Klik baris untuk melihat detail — atau gunakan Cmd/Ctrl+K untuk pencarian cepat.</div>
+
+      <AddOutletModal
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        onCreated={() => {
+          setAddOpen(false)
+          bumpDataVersion()
+        }}
+      />
     </div>
   )
 }

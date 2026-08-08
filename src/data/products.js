@@ -75,3 +75,29 @@ export function totalStok(product) {
 export function isProductCritical(product) {
   return Object.values(product.stockByWarehouse).some((stok) => stok <= product.stokMinimum)
 }
+
+export const productCategories = [...new Set(products.map((p) => p.kategori))]
+export const productUnits = [...new Set(products.map((p) => p.satuan))]
+
+let runtimeProductSeq = products.length + 1
+
+export function createProduct(payload) {
+  const stockByWarehouse = {}
+  warehouses.forEach((w) => {
+    stockByWarehouse[w.id] = payload.stockByWarehouse?.[w.id] ?? 0
+  })
+  const product = {
+    id: `prod-runtime-${runtimeProductSeq}`,
+    sku: `SKU${String(products.length + runtimeProductSeq).padStart(4, '0')}`,
+    nama: payload.nama,
+    kategori: payload.kategori,
+    satuan: payload.satuan,
+    isi: payload.isi,
+    harga: payload.harga,
+    stokMinimum: payload.stokMinimum,
+    stockByWarehouse,
+  }
+  runtimeProductSeq++
+  products.unshift(product)
+  return product
+}

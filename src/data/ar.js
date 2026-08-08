@@ -1,6 +1,7 @@
 import { orders, TODAY } from './orders'
 import { outlets } from './outlets'
-import { daysBetween } from '../lib/format'
+import { daysBetween, formatRupiah, formatDate } from '../lib/format'
+import { waLink } from '../lib/whatsapp'
 
 export const agingBuckets = [
   { key: 'belum_jatuh_tempo', label: 'Belum Jatuh Tempo', color: '#22c55e' },
@@ -63,9 +64,6 @@ export function piutangByOutlet(outletId) {
 }
 
 export function waReminderLink(receivable) {
-  const phone = (receivable.outletTelepon || '').replace(/[^0-9]/g, '').replace(/^0/, '62')
-  const msg = encodeURIComponent(
-    `Halo ${receivable.outletNama}, mengingatkan tagihan order ${receivable.nomorOrder} sebesar Rp ${receivable.sisa.toLocaleString('id-ID')} yang jatuh tempo pada ${receivable.jatuhTempo}. Mohon konfirmasi pembayarannya ya. Terima kasih 🙏`
-  )
-  return `https://wa.me/${phone}?text=${msg}`
+  const msg = `Halo ${receivable.outletNama}, mengingatkan tagihan order ${receivable.nomorOrder} sebesar ${formatRupiah(receivable.sisa)} yang jatuh tempo pada ${formatDate(receivable.jatuhTempo)}. Mohon konfirmasi pembayarannya ya. Terima kasih 🙏`
+  return waLink(receivable.outletTelepon, msg)
 }

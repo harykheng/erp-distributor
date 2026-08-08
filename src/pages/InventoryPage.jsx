@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, Package, ArrowDownToLine, ArrowUpFromLine, Undo2 } from 'lucide-react'
+import { AlertTriangle, Package, ArrowDownToLine, ArrowUpFromLine, Undo2, Plus, Warehouse as WarehouseIcon } from 'lucide-react'
 import { api } from '../data/api'
 import { warehouses } from '../data/warehouses'
 import { isProductCritical } from '../data/products'
+import { useAppStore } from '../store/useAppStore'
 import DataTable from '../components/common/DataTable'
 import Badge from '../components/common/Badge'
 import KpiCard from '../components/common/KpiCard'
+import AddProductModal from '../components/inventory/AddProductModal'
 import { formatRupiah, formatDate } from '../lib/format'
 
 const tabs = [
@@ -23,17 +25,20 @@ const jenisMeta = {
 const alasanVariant = { rusak: 'bad', kadaluarsa: 'warn', salah_kirim: 'brand' }
 
 export default function InventoryPage() {
+  const dataVersion = useAppStore((s) => s.dataVersion)
+  const bumpDataVersion = useAppStore((s) => s.bumpDataVersion)
   const [tab, setTab] = useState('stok')
   const [products, setProducts] = useState([])
   const [mutations, setMutations] = useState([])
   const [returns, setReturns] = useState([])
   const [whFilter, setWhFilter] = useState('semua')
+  const [addProductOpen, setAddProductOpen] = useState(false)
 
   useEffect(() => {
     api.getProducts().then(setProducts)
     api.getMutations().then(setMutations)
     api.getReturns().then(setReturns)
-  }, [])
+  }, [dataVersion])
 
   const criticalCount = products.filter(isProductCritical).length
 
@@ -147,19 +152,28 @@ export default function InventoryPage() {
             </button>
           ))}
         </div>
-        {tab === 'stok' && (
-          <select
-            value={whFilter}
-            onChange={(e) => setWhFilter(e.target.value)}
-            className="bg-base-850 border border-base-700 rounded-lg px-3 py-2 text-sm text-base-200"
-          >
-            <option value="semua">Semua Gudang</option>
-            {warehouses.map((w) => (
-              <option key={w.id} value={w.id}>{w.nama}</option>
-            ))}
-          </select>
-        )}
+        <button
+          onClick={() => setAddProductOpen(true)}
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-brand text-ink text-sm font-bold hover:bg-brand-400 shadow-card"
+        >
+          <Plus size={16} strokeWidth={2.5} /> Tambah Produk
+        </button>
       </div>
+
+      {tab === 'stok' && (
+        <div className="flex flex-wrap gap-2">
+          <WarehouseChip active={whFilter === 'semua'} onClick={() => setWhFilter('semua')} label="Semua Gudang" sub={`${products.length} produk`} />
+          {warehouses.map((w) => (
+            <WarehouseChip
+              key={w.id}
+              active={whFilter === w.id}
+              onClick={() => setWhFilter(w.id)}
+              label={w.nama}
+              sub={w.kota}
+            />
+          ))}
+        </div>
+      )}
 
       {tab === 'stok' && (
         <DataTable columns={stokColumns} data={products} searchKeys={['nama', 'sku', 'kategori']} searchPlaceholder="Cari produk atau SKU..." pageSize={12} />
@@ -170,6 +184,34 @@ export default function InventoryPage() {
       {tab === 'retur' && (
         <DataTable columns={returColumns} data={returns} searchKeys={['nomor', 'outletNama', 'productNama']} searchPlaceholder="Cari retur, outlet, atau produk..." pageSize={12} />
       )}
+
+      <AddProductModal
+        open={addProductOpen}
+        onClose={() => setAddProductOpen(false)}
+        onCreated={() => {
+          setAddProductOpen(false)
+          bumpDataVersion()
+        }}
+      />
     </div>
+  )
+}
+
+function WarehouseChip({ active, onClick, label, sub }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl border text-left transition-colors ${
+        active ? 'bg-brand/10 border-brand/40' : 'bg-base-900 border-base-800 hover:border-base-700'
+      }`}
+    >
+      <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${active ? 'bg-brand/15 text-brand' : 'bg-base-850 text-base-500'}`}>
+        <WarehouseIcon size={14} />
+      </div>
+      <div>
+        <div className={`text-sm font-semibold ${active ? 'text-brand' : 'text-base-200'}`}>{label}</div>
+        <div className="text-[11px] text-base-500">{sub}</div>
+      </div>
+    </button>
   )
 }

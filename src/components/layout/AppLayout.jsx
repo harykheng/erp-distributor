@@ -3,7 +3,7 @@ import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import MobileNav from './MobileNav'
 import CommandPalette from './CommandPalette'
-import OrderDrawer from '../orders/OrderDrawer'
+import OrderModal from '../orders/OrderModal'
 
 const titles = {
   '/': { title: 'Dashboard Utama', subtitle: 'Ringkasan operasional hari ini' },
@@ -39,7 +39,7 @@ export default function AppLayout() {
       </div>
       <MobileNav />
       <CommandPalette />
-      <OrderDrawer />
+      <OrderModal />
     </div>
   )
 }

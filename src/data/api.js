@@ -1,9 +1,9 @@
 // Lapisan query terpusat. Semua komponen mengambil data lewat fungsi di sini,
 // bukan import langsung dari file mock — supaya saat migrasi ke Supabase asli,
 // cukup ganti isi fungsi (jadi `supabase.from(...).select(...)`) tanpa ubah UI.
-import { outlets } from './outlets'
+import { outlets, createOutlet, setOutletStatus } from './outlets'
 import { salesReps } from './salesReps'
-import { products, totalStok } from './products'
+import { products, totalStok, createProduct } from './products'
 import { warehouses } from './warehouses'
 import { orders, outletOrderHistory, outletProductAverages, createOrder, recordPayment } from './orders'
 import { receivables, totalPiutang, piutangByBucket, piutangByOutlet, waReminderLink, agingBuckets } from './ar'
@@ -25,6 +25,14 @@ export const api = {
     await delay()
     return outlets.find((o) => o.id === id)
   },
+  async createOutlet(payload) {
+    await delay(200)
+    return createOutlet(payload)
+  },
+  async setOutletStatus(outletId, aktif) {
+    await delay(150)
+    return setOutletStatus(outletId, aktif)
+  },
   async getSalesReps() {
     await delay()
     return salesReps
@@ -32,6 +40,10 @@ export const api = {
   async getProducts() {
     await delay()
     return products.map((p) => ({ ...p, totalStok: totalStok(p) }))
+  },
+  async createProduct(payload) {
+    await delay(200)
+    return createProduct(payload)
   },
   async getWarehouses() {
     await delay()

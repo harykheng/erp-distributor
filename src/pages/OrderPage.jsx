@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Plus, Truck, Eye } from 'lucide-react'
+import { Plus, Truck, Eye, Printer, FileText, MessageCircle } from 'lucide-react'
 import { api } from '../data/api'
 import { outlets } from '../data/outlets'
 import { salesReps } from '../data/salesReps'
@@ -8,7 +8,8 @@ import DataTable from '../components/common/DataTable'
 import Badge, { statusVariant, statusLabel } from '../components/common/Badge'
 import Modal from '../components/common/Modal'
 import { formatRupiah, formatDate } from '../lib/format'
-import { statusFlow } from '../data/orders'
+import { statusFlow, orderWaLink } from '../data/orders'
+import { printInvoice, printSuratJalan } from '../lib/print'
 
 function outletName(id) {
   return outlets.find((o) => o.id === id)?.nama || '-'
@@ -126,6 +127,29 @@ export default function OrderPage() {
                 <Truck size={14} /> Surat jalan {detail.suratJalanNumber} sudah diterbitkan
               </div>
             )}
+            <div className="flex flex-wrap gap-2 border-t border-base-800 pt-4">
+              <button
+                onClick={() => printInvoice(detail, outlets.find((o) => o.id === detail.outletId))}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-base-700 bg-base-850 text-xs font-semibold text-base-200 hover:bg-base-800"
+              >
+                <Printer size={13} /> Print Invoice
+              </button>
+              <button
+                onClick={() => printSuratJalan(detail, outlets.find((o) => o.id === detail.outletId))}
+                disabled={!detail.suratJalanNumber}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-base-700 bg-base-850 text-xs font-semibold text-base-200 hover:bg-base-800 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <FileText size={13} /> Print Surat Jalan
+              </button>
+              <a
+                href={orderWaLink(detail)}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-good/10 text-good text-xs font-semibold hover:bg-good/20"
+              >
+                <MessageCircle size={13} /> Kirim WhatsApp
+              </a>
+            </div>
           </div>
         )}
       </Modal>

@@ -22,6 +22,7 @@ export default function PiutangPage() {
   const dataVersion = useAppStore((s) => s.dataVersion)
   const [receivables, setReceivables] = useState([])
   const [bucketFilter, setBucketFilter] = useState('semua')
+  const [outletFilter, setOutletFilter] = useState('semua')
   const [payReceivable, setPayReceivable] = useState(null)
 
   useEffect(() => {
@@ -34,10 +35,18 @@ export default function PiutangPage() {
     return agingBuckets.map((b) => ({ ...b, total: map[b.key] }))
   }, [receivables])
 
+  const outletOptions = useMemo(() => {
+    const map = new Map()
+    receivables.forEach((r) => map.set(r.outletId, r.outletNama))
+    return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1]))
+  }, [receivables])
+
   const total = receivables.reduce((s, r) => s + r.sisa, 0)
   const overdueCount = receivables.filter((r) => r.bucket !== 'belum_jatuh_tempo').length
 
-  const filtered = bucketFilter === 'semua' ? receivables : receivables.filter((r) => r.bucket === bucketFilter)
+  const filtered = receivables
+    .filter((r) => bucketFilter === 'semua' || r.bucket === bucketFilter)
+    .filter((r) => outletFilter === 'semua' || r.outletId === outletFilter)
 
   const columns = [
     { key: 'outletNama', label: 'Outlet', sortable: true },
@@ -94,15 +103,29 @@ export default function PiutangPage() {
         <AgingBar buckets={buckets} total={total} />
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <FilterChip active={bucketFilter === 'semua'} onClick={() => setBucketFilter('semua')}>
-          Semua ({receivables.length})
-        </FilterChip>
-        {agingBuckets.map((b) => (
-          <FilterChip key={b.key} active={bucketFilter === b.key} onClick={() => setBucketFilter(b.key)} color={b.color}>
-            {b.label} ({receivables.filter((r) => r.bucket === b.key).length})
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-2">
+          <FilterChip active={bucketFilter === 'semua'} onClick={() => setBucketFilter('semua')}>
+            Semua ({receivables.length})
           </FilterChip>
-        ))}
+          {agingBuckets.map((b) => (
+            <FilterChip key={b.key} active={bucketFilter === b.key} onClick={() => setBucketFilter(b.key)} color={b.color}>
+              {b.label} ({receivables.filter((r) => r.bucket === b.key).length})
+            </FilterChip>
+          ))}
+        </div>
+        <select
+          value={outletFilter}
+          onChange={(e) => setOutletFilter(e.target.value)}
+          className="bg-base-850 border border-base-700 rounded-lg px-3 py-2 text-xs font-semibold text-base-200 focus:outline-none focus:ring-1 focus:ring-brand/60"
+        >
+          <option value="semua">Semua Toko</option>
+          {outletOptions.map(([id, nama]) => (
+            <option key={id} value={id}>
+              {nama}
+            </option>
+          ))}
+        </select>
       </div>
 
       <DataTable
