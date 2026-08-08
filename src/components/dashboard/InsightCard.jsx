@@ -1,11 +1,23 @@
 import { Link } from 'react-router-dom'
-import { AlertTriangle, Info, AlertOctagon, ArrowRight } from 'lucide-react'
+import { AlertTriangle, Info } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const styles = {
-  danger: { icon: AlertOctagon, ring: 'border-bad/30', bg: 'bg-bad/10', text: 'text-bad' },
-  warning: { icon: AlertTriangle, ring: 'border-warn/30', bg: 'bg-warn/10', text: 'text-warn' },
-  info: { icon: Info, ring: 'border-brand/30', bg: 'bg-brand/10', text: 'text-brand' },
+  danger: {
+    icon: AlertTriangle,
+    card: 'border-bad/30 bg-bad/[0.06] hover:bg-bad/[0.1]',
+    iconWrap: 'bg-bad/15 text-bad',
+  },
+  warning: {
+    icon: AlertTriangle,
+    card: 'border-warn/30 bg-warn/[0.06] hover:bg-warn/[0.1]',
+    iconWrap: 'bg-warn/15 text-warn',
+  },
+  info: {
+    icon: Info,
+    card: 'border-base-800 bg-base-850 hover:bg-base-800/70',
+    iconWrap: 'bg-base-800 text-base-400',
+  },
 }
 
 export default function InsightCard({ insight, index = 0 }) {
@@ -19,16 +31,15 @@ export default function InsightCard({ insight, index = 0 }) {
     >
       <Link
         to={insight.link || '#'}
-        className={`flex items-start gap-3 p-4 rounded-2xl border ${s.ring} bg-base-900 hover:bg-base-850 transition-colors shadow-card group`}
+        className={`flex items-start gap-3 p-4 rounded-2xl border transition-colors shadow-card h-full ${s.card}`}
       >
-        <div className={`w-9 h-9 rounded-xl ${s.bg} ${s.text} flex items-center justify-center shrink-0`}>
-          <Icon size={17} />
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${s.iconWrap}`}>
+          <Icon size={15} strokeWidth={2.25} />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-semibold text-base-100">{insight.title}</div>
-          <p className="text-xs text-base-400 mt-0.5 leading-relaxed">{insight.message}</p>
+          <div className="text-sm font-bold text-base-100 leading-snug">{insight.title}</div>
+          <p className="text-xs text-base-400 mt-1 leading-relaxed">{insight.message}</p>
         </div>
-        <ArrowRight size={15} className="text-base-600 group-hover:text-base-300 shrink-0 mt-1.5 transition-colors" />
       </Link>
     </motion.div>
   )

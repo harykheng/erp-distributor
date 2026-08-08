@@ -3,7 +3,7 @@ import { Wallet, TrendingUp, Store, PackageX } from 'lucide-react'
 import { api } from '../data/api'
 import { useAppStore } from '../store/useAppStore'
 import KpiCard from '../components/common/KpiCard'
-import InsightCard from '../components/dashboard/InsightCard'
+import InsightSection from '../components/dashboard/InsightSection'
 import ActivityFeed from '../components/dashboard/ActivityFeed'
 import SalesTrendChart from '../components/dashboard/SalesTrendChart'
 import AgingBar from '../components/common/AgingBar'
@@ -12,7 +12,6 @@ import { piutangByBucket, totalPiutang } from '../data/ar'
 
 export default function DashboardPage() {
   const dataVersion = useAppStore((s) => s.dataVersion)
-  const mode = useAppStore((s) => s.mode)
   const [kpi, setKpi] = useState(null)
   const [insights, setInsights] = useState([])
   const [trend, setTrend] = useState([])
@@ -73,24 +72,7 @@ export default function DashboardPage() {
             <AgingBar buckets={buckets} total={totalPiutang()} />
           </div>
 
-          {mode === 'power' && (
-            <div className="rounded-2xl border border-base-800 bg-base-900 shadow-card p-5">
-              <h3 className="font-bold text-base-100 text-sm mb-3">Insight Cards — Semua</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {insights.map((ins, i) => (
-                  <InsightCard key={ins.id} insight={ins} index={i} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {mode === 'simple' && (
-            <div className="space-y-3">
-              {insights.map((ins, i) => (
-                <InsightCard key={ins.id} insight={ins} index={i} />
-              ))}
-            </div>
-          )}
+          <InsightSection insights={insights} />
         </div>
 
         <div>
