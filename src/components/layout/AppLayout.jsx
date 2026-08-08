@@ -11,6 +11,7 @@ const titles = {
   '/piutang': { title: 'Piutang (AR)', subtitle: 'Aging piutang dan penagihan' },
   '/outlet': { title: 'Outlet / Customer', subtitle: 'Daftar toko dan warung pelanggan' },
   '/sales-rep': { title: 'Sales Rep', subtitle: 'Target, capaian, dan rute kunjungan' },
+  '/sales-portal': { title: 'Portal Sales', subtitle: 'Ajukan order dan pantau status verifikasi' },
   '/inventory': { title: 'Inventory / Gudang', subtitle: 'Stok, mutasi, dan retur barang' },
   '/laporan': { title: 'Laporan', subtitle: 'Rekap penjualan dan performa' },
   '/settings': { title: 'Settings', subtitle: 'Profil bisnis dan konfigurasi' },

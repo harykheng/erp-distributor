@@ -22,36 +22,41 @@ export function overdueDaysOf(jatuhTempo) {
   return daysBetween(new Date(jatuhTempo), new Date(TODAY))
 }
 
-// Piutang = order yang sudah dikirim tapi belum lunas penuh
-export const receivables = orders
-  .filter((o) => o.isSent && o.dibayar < o.total)
-  .map((o) => {
-    const outlet = outlets.find((x) => x.id === o.outletId)
-    const sisa = o.total - o.dibayar
-    return {
-      id: `ar-${o.id}`,
-      orderId: o.id,
-      nomorOrder: o.nomor,
-      outletId: o.outletId,
-      outletNama: outlet?.nama,
-      outletTelepon: outlet?.telepon,
-      salesRepId: o.salesRepId,
-      tanggalOrder: o.tanggal,
-      jatuhTempo: o.jatuhTempo,
-      total: o.total,
-      dibayar: o.dibayar,
-      sisa,
-      bucket: getAgingBucket(o.jatuhTempo),
-      overdueDays: overdueDaysOf(o.jatuhTempo),
-    }
-  })
-  .sort((a, b) => new Date(a.jatuhTempo) - new Date(b.jatuhTempo))
+// Piutang = order yang sudah dikirim tapi belum lunas penuh.
+// Dihitung ulang tiap dipanggil (bukan cache statis) supaya selalu ikut
+// perubahan pembayaran/order terbaru dalam sesi yang sama.
+export function getReceivables() {
+  return orders
+    .filter((o) => o.isSent && o.dibayar < o.total)
+    .map((o) => {
+      const outlet = outlets.find((x) => x.id === o.outletId)
+      const sisa = o.total - o.dibayar
+      return {
+        id: `ar-${o.id}`,
+        orderId: o.id,
+        nomorOrder: o.nomor,
+        outletId: o.outletId,
+        outletNama: outlet?.nama,
+        outletTelepon: outlet?.telepon,
+        salesRepId: o.salesRepId,
+        tanggalOrder: o.tanggal,
+        jatuhTempo: o.jatuhTempo,
+        total: o.total,
+        dibayar: o.dibayar,
+        sisa,
+        bucket: getAgingBucket(o.jatuhTempo),
+        overdueDays: overdueDaysOf(o.jatuhTempo),
+      }
+    })
+    .sort((a, b) => new Date(a.jatuhTempo) - new Date(b.jatuhTempo))
+}
 
 export function totalPiutang() {
-  return receivables.reduce((sum, r) => sum + r.sisa, 0)
+  return getReceivables().reduce((sum, r) => sum + r.sisa, 0)
 }
 
 export function piutangByBucket() {
+  const receivables = getReceivables()
   const map = Object.fromEntries(agingBuckets.map((b) => [b.key, 0]))
   receivables.forEach((r) => {
     map[r.bucket] += r.sisa
@@ -60,7 +65,7 @@ export function piutangByBucket() {
 }
 
 export function piutangByOutlet(outletId) {
-  return receivables.filter((r) => r.outletId === outletId)
+  return getReceivables().filter((r) => r.outletId === outletId)
 }
 
 export function waReminderLink(receivable) {

@@ -5,12 +5,12 @@ import { outlets, createOutlet, setOutletStatus } from './outlets'
 import { salesReps } from './salesReps'
 import { products, totalStok, createProduct } from './products'
 import { warehouses } from './warehouses'
-import { orders, outletOrderHistory, outletProductAverages, createOrder, recordPayment } from './orders'
-import { receivables, totalPiutang, piutangByBucket, piutangByOutlet, waReminderLink, agingBuckets } from './ar'
+import { orders, outletOrderHistory, outletProductAverages, createOrder, recordPayment, requestOrder, verifyOrderRequest } from './orders'
+import { getReceivables, totalPiutang, piutangByBucket, piutangByOutlet, waReminderLink, agingBuckets } from './ar'
 import { returns } from './returns'
 import { mutations, mutationsByWarehouse } from './stockMutations'
 import { activityFeed } from './activity'
-import { insights, totalOutletAktif, totalStokKritis } from './insights'
+import { getInsights, totalOutletAktif, totalStokKritis } from './insights'
 import { salesTrend30, penjualanBulanIni } from './salesTrend'
 import { repPerformance, ruteKunjungan } from './repPerformance'
 
@@ -61,6 +61,14 @@ export const api = {
     await delay(200)
     return recordPayment(orderId, amount)
   },
+  async requestOrder(payload) {
+    await delay(200)
+    return requestOrder(payload)
+  },
+  async verifyOrderRequest(orderId, approve) {
+    await delay(200)
+    return verifyOrderRequest(orderId, approve)
+  },
   async getOutletHistory(outletId) {
     await delay()
     return outletOrderHistory(outletId)
@@ -71,7 +79,7 @@ export const api = {
   },
   async getReceivables() {
     await delay()
-    return receivables
+    return getReceivables()
   },
   async getPiutangByOutlet(outletId) {
     await delay()
@@ -91,7 +99,7 @@ export const api = {
   },
   async getInsights() {
     await delay()
-    return insights
+    return getInsights()
   },
   async getSalesTrend() {
     await delay()
