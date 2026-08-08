@@ -58,10 +58,15 @@ export const products = catalog.map((p, i) => {
     const isCritical = (i + wi) % 9 === 0
     stockByWarehouse[w.id] = isCritical ? rng.int(2, 8) : rng.int(15, 220)
   })
+  // margin kotor khas distributor FMCG: sekitar 12-28% dari harga jual
+  const marginPct = rng.int(12, 28)
+  const hargaModal = Math.round((p.harga * (100 - marginPct)) / 100 / 100) * 100
+
   return {
     id: `prod-${i + 1}`,
     sku: `SKU${String(i + 1).padStart(4, '0')}`,
     ...p,
+    hargaModal,
     stokMinimum: rng.int(15, 30),
     stockByWarehouse,
   }
@@ -94,6 +99,7 @@ export function createProduct(payload) {
     satuan: payload.satuan,
     isi: payload.isi,
     harga: payload.harga,
+    hargaModal: payload.hargaModal || Math.round((payload.harga * 0.8) / 100) * 100,
     stokMinimum: payload.stokMinimum,
     stockByWarehouse,
   }
