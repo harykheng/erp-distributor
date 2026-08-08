@@ -39,3 +39,32 @@ export const outlets = namaToko.map((nama, i) => {
     bergabungSejak: `202${rng.int(1, 4)}-${String(rng.int(1, 12)).padStart(2, '0')}-01`,
   }
 })
+
+export { tipeOutlet }
+
+let runtimeOutletSeq = outlets.length + 1
+
+export function createOutlet(payload) {
+  const outlet = {
+    id: `outlet-runtime-${runtimeOutletSeq++}`,
+    nama: payload.nama,
+    tipe: payload.tipe,
+    zona: payload.zona,
+    alamat: payload.alamat,
+    telepon: payload.telepon,
+    kontak: payload.kontak,
+    kreditLimit: payload.kreditLimit,
+    salesRepId: payload.salesRepId,
+    aktif: true,
+    bergabungSejak: new Date().toISOString().slice(0, 10),
+  }
+  outlets.unshift(outlet)
+  return outlet
+}
+
+export function setOutletStatus(outletId, aktif) {
+  const outlet = outlets.find((o) => o.id === outletId)
+  if (!outlet) return null
+  outlet.aktif = aktif
+  return outlet
+}

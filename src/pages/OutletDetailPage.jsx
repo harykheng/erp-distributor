@@ -5,13 +5,15 @@ import { api } from '../data/api'
 import { salesReps } from '../data/salesReps'
 import { useAppStore } from '../store/useAppStore'
 import KpiCard from '../components/common/KpiCard'
-import Badge, { statusVariant, statusLabel } from '../components/common/Badge'
+import { statusVariant, statusLabel } from '../components/common/Badge'
+import Switch from '../components/common/Switch'
 import { formatRupiah, formatDate } from '../lib/format'
 
 export default function OutletDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const dataVersion = useAppStore((s) => s.dataVersion)
+  const bumpDataVersion = useAppStore((s) => s.bumpDataVersion)
   const [outlet, setOutlet] = useState(null)
   const [history, setHistory] = useState([])
   const [piutang, setPiutang] = useState([])
@@ -52,9 +54,18 @@ export default function OutletDetailPage() {
               </div>
             </div>
           </div>
-          <Badge variant={outlet.aktif ? 'good' : 'default'} dot>
-            {outlet.aktif ? 'Aktif' : 'Nonaktif'}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={outlet.aktif}
+              onChange={async (next) => {
+                await api.setOutletStatus(outlet.id, next)
+                bumpDataVersion()
+              }}
+            />
+            <span className={`text-sm font-semibold ${outlet.aktif ? 'text-good' : 'text-base-500'}`}>
+              {outlet.aktif ? 'Aktif' : 'Nonaktif'}
+            </span>
+          </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 text-sm">
           <DetailRow icon={MapPin} label="Alamat" value={outlet.alamat} />
