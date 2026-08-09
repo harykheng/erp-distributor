@@ -13,7 +13,6 @@ const items = [
 
 const moreItems = [
   { to: '/outlet', label: 'Outlet / Customer', icon: Store },
-  { to: '/sales-portal', label: 'Portal Sales', icon: Send },
   { to: '/laporan', label: 'Laporan', icon: FileBarChart },
   { to: '/settings', label: 'Settings', icon: Settings },
 ]
@@ -94,6 +93,15 @@ export default function MobileNav() {
                     {label}
                   </NavLink>
                 ))}
+                <a
+                  href="/sales"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-brand hover:bg-brand/10"
+                >
+                  <Send size={18} />
+                  Buka Portal Sales
+                </a>
               </div>
             </motion.div>
           </>

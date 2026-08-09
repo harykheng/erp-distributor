@@ -10,6 +10,7 @@ import {
   FileBarChart,
   Settings,
   Boxes,
+  ArrowUpRight,
 } from 'lucide-react'
 
 const navItems = [
@@ -18,7 +19,6 @@ const navItems = [
   { to: '/piutang', label: 'Piutang', icon: Wallet },
   { to: '/outlet', label: 'Outlet / Customer', icon: Store },
   { to: '/sales-rep', label: 'Sales Rep', icon: Users },
-  { to: '/sales-portal', label: 'Portal Sales', icon: Send },
   { to: '/inventory', label: 'Inventory / Gudang', icon: Warehouse },
   { to: '/laporan', label: 'Laporan', icon: FileBarChart },
   { to: '/settings', label: 'Settings', icon: Settings },
@@ -55,7 +55,18 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
-      <div className="p-4 border-t border-base-800">
+      <div className="p-4 border-t border-base-800 space-y-2">
+        <a
+          href="/sales"
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center justify-between gap-2 rounded-xl bg-brand/10 border border-brand/30 px-3 py-2.5 text-xs font-semibold text-brand hover:bg-brand/15 transition-colors"
+        >
+          <span className="flex items-center gap-2">
+            <Send size={14} /> Buka Portal Sales
+          </span>
+          <ArrowUpRight size={13} />
+        </a>
         <div className="rounded-xl bg-base-850 border border-base-800 p-3">
           <div className="text-xs font-semibold text-base-200">UD Sumber Makmur Distribusi</div>
           <div className="text-[11px] text-base-500 mt-0.5">Paket Demo &middot; Studio Harel</div>
