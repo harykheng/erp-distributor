@@ -38,6 +38,12 @@ export default function OrderPage() {
     setDetail(null)
   }
 
+  async function handleShip(orderId) {
+    await api.markAsShipped(orderId)
+    bumpDataVersion()
+    setDetail(null)
+  }
+
   const filtered = useMemo(() => {
     if (statusFilter === 'semua') return orders
     return orders.filter((o) => o.status === statusFilter)
@@ -92,6 +98,17 @@ export default function OrderPage() {
                 <XCircle size={13} /> Tolak
               </button>
             </>
+          )}
+          {(r.status === 'draft' || r.status === 'diproses') && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                handleShip(r.id)
+              }}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-brand/10 text-brand text-xs font-semibold hover:bg-brand/20"
+            >
+              <Truck size={13} /> Kirim Sekarang
+            </button>
           )}
         </div>
       ),
@@ -182,6 +199,14 @@ export default function OrderPage() {
               </div>
             ) : (
               <div className="flex flex-wrap gap-2 border-t border-base-800 pt-4">
+                {(detail.status === 'draft' || detail.status === 'diproses') && (
+                  <button
+                    onClick={() => handleShip(detail.id)}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-brand/10 text-brand text-xs font-semibold hover:bg-brand/20"
+                  >
+                    <Truck size={13} /> Kirim Sekarang
+                  </button>
+                )}
                 <button
                   onClick={() => printInvoice(detail, outlets.find((o) => o.id === detail.outletId))}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-base-700 bg-base-850 text-xs font-semibold text-base-200 hover:bg-base-800"

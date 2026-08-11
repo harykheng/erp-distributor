@@ -239,6 +239,16 @@ export function verifyOrderRequest(orderId, approve) {
   return order
 }
 
+// order draft/diproses -> dikirim: barang jalan, surat jalan terbit
+export function markAsShipped(orderId) {
+  const order = orders.find((o) => o.id === orderId)
+  if (!order) return null
+  order.status = 'dikirim'
+  order.suratJalanNumber = order.suratJalanNumber || `SJ-2026-${String(runtimeSjSeq++).padStart(4, '0')}`
+  order.isSent = true
+  return order
+}
+
 export function recordPayment(orderId, amount) {
   const order = orders.find((o) => o.id === orderId)
   if (!order) return null
