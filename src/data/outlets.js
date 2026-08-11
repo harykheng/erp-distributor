@@ -31,7 +31,8 @@ export const outlets = namaToko.map((nama, i) => {
     tipe: rng.pick(tipeOutlet),
     zona,
     alamat: `${rng.pick(jalanList)} No. ${rng.int(1, 150)}, ${zona}`,
-    telepon: `08${rng.int(11, 99)}-${rng.int(1000, 9999)}-${rng.int(1000, 9999)}`,
+    // sengaja disamain ke satu nomor supaya fitur WhatsApp bisa ditest langsung pas demo
+    telepon: '0812-9256-7788',
     kontak: nama.replace(/^(Toko|Warung|UD)\s/, ''),
     kreditLimit,
     salesRepId: `rep-${(i % 6) + 1}`,
