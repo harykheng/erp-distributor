@@ -1,5 +1,6 @@
-import { Search, Bell, Plus } from 'lucide-react'
+import { Search, Plus } from 'lucide-react'
 import ThemeToggle from '../common/ThemeToggle'
+import NotificationDropdown from './NotificationDropdown'
 import { useAppStore } from '../../store/useAppStore'
 
 export default function Topbar({ title, subtitle }) {
@@ -30,10 +31,7 @@ export default function Topbar({ title, subtitle }) {
         >
           <Search size={16} />
         </button>
-        <button className="relative w-9 h-9 hidden sm:flex items-center justify-center rounded-lg border border-base-700 bg-base-850 text-base-400 hover:text-base-100">
-          <Bell size={16} />
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-brand" />
-        </button>
+        <NotificationDropdown />
         <ThemeToggle />
         <button
           onClick={openOrderDrawer}

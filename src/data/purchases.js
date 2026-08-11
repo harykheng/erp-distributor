@@ -56,29 +56,39 @@ purchases.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal))
 
 let runtimePurchaseSeq = purchaseCount + 1
 
-// Pembelian baru: langsung diterima & menambah stok gudang tujuan
-export function createPurchase({ supplier, productId, qty, hargaBeli, warehouseId, tanggal }) {
-  const product = products.find((p) => p.id === productId)
-  if (!product) return null
+// Pembelian baru: satu PO bisa berisi beberapa item, langsung diterima & menambah stok gudang tujuan
+export function createPurchaseOrder({ supplier, warehouseId, tanggal, items }) {
+  if (!items || items.length === 0) return null
 
-  const purchase = {
-    id: `pembelian-runtime-${runtimePurchaseSeq}`,
-    nomor: `PO-2026-${String(purchaseCount + runtimePurchaseSeq).padStart(4, '0')}`,
-    tanggal: tanggal || isoDate(new Date()),
-    supplier,
-    productId,
-    productNama: product.nama,
-    satuan: product.satuan,
-    qty,
-    hargaBeli,
-    totalBiaya: qty * hargaBeli,
-    warehouseId,
-    status: 'diterima',
-  }
+  const nomor = `PO-2026-${String(purchaseCount + runtimePurchaseSeq).padStart(4, '0')}`
   runtimePurchaseSeq++
-  purchases.unshift(purchase)
 
-  product.stockByWarehouse[warehouseId] = (product.stockByWarehouse[warehouseId] || 0) + qty
+  const created = []
+  for (const item of items) {
+    const product = products.find((p) => p.id === item.productId)
+    if (!product) continue
 
-  return purchase
+    const purchase = {
+      id: `pembelian-runtime-${runtimePurchaseSeq}`,
+      nomor,
+      tanggal: tanggal || isoDate(new Date()),
+      supplier,
+      productId: item.productId,
+      productNama: product.nama,
+      satuan: product.satuan,
+      qty: item.qty,
+      hargaBeli: item.hargaBeli,
+      totalBiaya: item.qty * item.hargaBeli,
+      warehouseId,
+      status: 'diterima',
+    }
+    runtimePurchaseSeq++
+    created.push(purchase)
+
+    product.stockByWarehouse[warehouseId] = (product.stockByWarehouse[warehouseId] || 0) + item.qty
+  }
+
+  purchases.unshift(...created)
+
+  return created
 }
