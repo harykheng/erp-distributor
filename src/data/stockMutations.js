@@ -79,3 +79,18 @@ mutations.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal))
 export function mutationsByWarehouse(warehouseId) {
   return mutations.filter((m) => m.warehouseId === warehouseId)
 }
+
+export function logReturnMutation(retur) {
+  mutations.unshift({
+    id: `mut-${mCounter++}`,
+    tanggal: retur.tanggal,
+    jenis: 'retur',
+    productId: retur.productId,
+    productNama: retur.productNama,
+    satuan: retur.satuan,
+    qty: retur.qty,
+    warehouseId: retur.warehouseId,
+    keterangan: `Retur dari outlet — ${retur.alasanLabel}`,
+    refNomor: retur.nomor,
+  })
+}
