@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, Package, ArrowDownToLine, ArrowUpFromLine, Undo2, Warehouse as WarehouseIcon } from 'lucide-react'
+import { AlertTriangle, Package, ArrowDownToLine, ArrowUpFromLine, ArrowLeftRight, Undo2, Warehouse as WarehouseIcon } from 'lucide-react'
 import { api } from '../data/api'
 import { warehouses } from '../data/warehouses'
 import { isProductCritical } from '../data/products'
@@ -8,17 +8,20 @@ import DataTable from '../components/common/DataTable'
 import Badge from '../components/common/Badge'
 import KpiCard from '../components/common/KpiCard'
 import CreateReturnModal from '../components/inventory/CreateReturnModal'
+import CreateTransferModal from '../components/inventory/CreateTransferModal'
 import { formatRupiah, formatDate } from '../lib/format'
 
 const tabs = [
   { key: 'stok', label: 'Stok per Gudang' },
   { key: 'mutasi', label: 'Riwayat Mutasi' },
+  { key: 'transfer', label: 'Transfer Antar Gudang' },
   { key: 'retur', label: 'Retur Barang' },
 ]
 
 const jenisMeta = {
   masuk: { label: 'Masuk', variant: 'good', icon: ArrowDownToLine },
   keluar: { label: 'Keluar', variant: 'brand', icon: ArrowUpFromLine },
+  transfer: { label: 'Transfer', variant: 'brand', icon: ArrowLeftRight },
   retur: { label: 'Retur', variant: 'warn', icon: Undo2 },
 }
 
@@ -33,11 +36,14 @@ export default function InventoryPage() {
   const [returns, setReturns] = useState([])
   const [whFilter, setWhFilter] = useState('semua')
   const [createReturnOpen, setCreateReturnOpen] = useState(false)
+  const [createTransferOpen, setCreateTransferOpen] = useState(false)
+  const [transfers, setTransfers] = useState([])
 
   useEffect(() => {
     api.getProducts().then(setProducts)
     api.getMutations().then(setMutations)
     api.getReturns().then(setReturns)
+    api.getTransfers().then(setTransfers)
   }, [dataVersion])
 
   const criticalCount = products.filter(isProductCritical).length
@@ -110,6 +116,21 @@ export default function InventoryPage() {
     { key: 'refNomor', label: 'No. Referensi', render: (m) => <span className="text-xs text-base-500">{m.refNomor}</span> },
   ]
 
+  const transferColumns = [
+    { key: 'nomor', label: 'No. Transfer', sortable: true },
+    { key: 'tanggal', label: 'Tanggal', sortable: true, render: (t) => formatDate(t.tanggal) },
+    { key: 'productNama', label: 'Produk', sortable: true },
+    { key: 'qty', label: 'Qty', render: (t) => `${t.qty} ${t.satuan}` },
+    { key: 'fromWarehouseNama', label: 'Dari Gudang', sortable: true },
+    { key: 'toWarehouseNama', label: 'Ke Gudang', sortable: true },
+    { key: 'catatan', label: 'Catatan', render: (t) => (t.catatan ? <span className="text-xs text-base-400">{t.catatan}</span> : <span className="text-xs text-base-600">-</span>) },
+    {
+      key: 'status',
+      label: 'Status',
+      render: () => <Badge variant="good" dot>Selesai</Badge>,
+    },
+  ]
+
   const returColumns = [
     { key: 'nomor', label: 'No. Retur', sortable: true },
     { key: 'tanggal', label: 'Tanggal', sortable: true, render: (r) => formatDate(r.tanggal) },
@@ -160,6 +181,14 @@ export default function InventoryPage() {
             <Undo2 size={16} strokeWidth={2.5} /> Buat Retur
           </button>
         )}
+        {tab === 'transfer' && (
+          <button
+            onClick={() => setCreateTransferOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-brand text-ink text-sm font-bold hover:bg-brand-400 shadow-card"
+          >
+            <ArrowLeftRight size={16} strokeWidth={2.5} /> Transfer Stok
+          </button>
+        )}
       </div>
 
       {tab === 'stok' && (
@@ -183,6 +212,9 @@ export default function InventoryPage() {
       {tab === 'mutasi' && (
         <DataTable columns={mutasiColumns} data={mutations} searchKeys={['productNama', 'refNomor']} searchPlaceholder="Cari produk atau nomor referensi..." pageSize={12} />
       )}
+      {tab === 'transfer' && (
+        <DataTable columns={transferColumns} data={transfers} searchKeys={['nomor', 'productNama', 'fromWarehouseNama', 'toWarehouseNama']} searchPlaceholder="Cari transfer, produk, atau gudang..." pageSize={12} />
+      )}
       {tab === 'retur' && (
         <DataTable columns={returColumns} data={returns} searchKeys={['nomor', 'outletNama', 'productNama']} searchPlaceholder="Cari retur, outlet, atau produk..." pageSize={12} />
       )}
@@ -190,6 +222,11 @@ export default function InventoryPage() {
       <CreateReturnModal
         open={createReturnOpen}
         onClose={() => setCreateReturnOpen(false)}
+        onCreated={() => bumpDataVersion()}
+      />
+      <CreateTransferModal
+        open={createTransferOpen}
+        onClose={() => setCreateTransferOpen(false)}
         onCreated={() => bumpDataVersion()}
       />
     </div>
