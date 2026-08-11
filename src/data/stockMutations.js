@@ -1,19 +1,6 @@
-import { makeRng } from './rng'
 import { orders } from './orders'
 import { returns } from './returns'
-import { products } from './products'
-import { warehouses } from './warehouses'
-
-const rng = makeRng(505)
-
-function addDays(date, days) {
-  const d = new Date(date)
-  d.setDate(d.getDate() + days)
-  return d
-}
-function isoDate(d) {
-  return d.toISOString().slice(0, 10)
-}
+import { purchases } from './purchases'
 
 export const mutations = []
 let mCounter = 1
@@ -38,25 +25,21 @@ orders
     })
   })
 
-// masuk: restock berkala dari supplier, 60 hari terakhir
-const restockCount = 40
-for (let i = 0; i < restockCount; i++) {
-  const product = rng.pick(products)
-  const warehouse = rng.pick(warehouses)
-  const daysAgo = rng.int(0, 59)
+// masuk: pembelian dari supplier
+purchases.forEach((p) => {
   mutations.push({
     id: `mut-${mCounter++}`,
-    tanggal: isoDate(addDays(new Date('2026-08-08'), -daysAgo)),
+    tanggal: p.tanggal,
     jenis: 'masuk',
-    productId: product.id,
-    productNama: product.nama,
-    satuan: product.satuan,
-    qty: rng.pick([20, 30, 50, 60, 100]),
-    warehouseId: warehouse.id,
-    keterangan: 'Restock dari supplier',
-    refNomor: `PO-SUP-${String(1000 + i)}`,
+    productId: p.productId,
+    productNama: p.productNama,
+    satuan: p.satuan,
+    qty: p.qty,
+    warehouseId: p.warehouseId,
+    keterangan: `Pembelian dari ${p.supplier}`,
+    refNomor: p.nomor,
   })
-}
+})
 
 // retur: kembali ke gudang
 returns.forEach((r) => {
@@ -92,5 +75,20 @@ export function logReturnMutation(retur) {
     warehouseId: retur.warehouseId,
     keterangan: `Retur dari outlet — ${retur.alasanLabel}`,
     refNomor: retur.nomor,
+  })
+}
+
+export function logPurchaseMutation(purchase) {
+  mutations.unshift({
+    id: `mut-${mCounter++}`,
+    tanggal: purchase.tanggal,
+    jenis: 'masuk',
+    productId: purchase.productId,
+    productNama: purchase.productNama,
+    satuan: purchase.satuan,
+    qty: purchase.qty,
+    warehouseId: purchase.warehouseId,
+    keterangan: `Pembelian dari ${purchase.supplier}`,
+    refNomor: purchase.nomor,
   })
 }

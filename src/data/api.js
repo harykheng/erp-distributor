@@ -8,7 +8,8 @@ import { warehouses } from './warehouses'
 import { orders, outletOrderHistory, outletProductAverages, createOrder, recordPayment, requestOrder, verifyOrderRequest, markAsShipped } from './orders'
 import { getReceivables, totalPiutang, piutangByBucket, piutangByOutlet, waReminderLink, agingBuckets } from './ar'
 import { returns, createReturn } from './returns'
-import { mutations, mutationsByWarehouse, logReturnMutation } from './stockMutations'
+import { purchases, suppliers, createPurchase } from './purchases'
+import { mutations, mutationsByWarehouse, logReturnMutation, logPurchaseMutation } from './stockMutations'
 import { activityFeed } from './activity'
 import { getInsights, totalOutletAktif, totalStokKritis } from './insights'
 import { salesTrend30, penjualanBulanIni } from './salesTrend'
@@ -102,6 +103,20 @@ export const api = {
   async getMutations(warehouseId) {
     await delay()
     return warehouseId ? mutationsByWarehouse(warehouseId) : mutations
+  },
+  async getPurchases() {
+    await delay()
+    return purchases
+  },
+  async getSuppliers() {
+    await delay()
+    return suppliers
+  },
+  async createPurchase(payload) {
+    await delay(200)
+    const purchase = createPurchase(payload)
+    if (purchase) logPurchaseMutation(purchase)
+    return purchase
   },
   async getActivityFeed() {
     await delay()
