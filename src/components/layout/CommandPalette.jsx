@@ -36,6 +36,7 @@ export default function CommandPalette() {
     const actions = [
       { id: 'act-order', type: 'action', label: 'Buat Order Baru', icon: ShoppingCart, run: () => openOrderDrawer() },
       { id: 'act-piutang', type: 'action', label: 'Buka Modul Piutang', icon: Wallet, run: () => navigate('/piutang') },
+      { id: 'act-produk', type: 'action', label: 'Buka Produk', icon: Package, run: () => navigate('/produk') },
       { id: 'act-inv', type: 'action', label: 'Buka Inventory / Gudang', icon: Package, run: () => navigate('/inventory') },
     ]
     if (!q) {
@@ -121,7 +122,7 @@ export default function CommandPalette() {
                 {results.products.length > 0 && (
                   <Section title="Produk">
                     {results.products.map((p) => (
-                      <Row key={p.id} icon={Package} label={p.nama} meta={p.sku} onClick={() => go('/inventory')} />
+                      <Row key={p.id} icon={Package} label={p.nama} meta={p.sku} onClick={() => go('/produk')} />
                     ))}
                   </Section>
                 )}
