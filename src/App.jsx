@@ -3,6 +3,7 @@ import AppLayout from './components/layout/AppLayout'
 import DashboardPage from './pages/DashboardPage'
 import OrderPage from './pages/OrderPage'
 import PiutangPage from './pages/PiutangPage'
+import PajakPage from './pages/PajakPage'
 import OutletPage from './pages/OutletPage'
 import OutletDetailPage from './pages/OutletDetailPage'
 import SalesRepPage from './pages/SalesRepPage'
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/" element={<DashboardPage />} />
         <Route path="/order" element={<OrderPage />} />
         <Route path="/piutang" element={<PiutangPage />} />
+        <Route path="/pajak" element={<PajakPage />} />
         <Route path="/outlet" element={<OutletPage />} />
         <Route path="/outlet/:id" element={<OutletDetailPage />} />
         <Route path="/sales-rep" element={<SalesRepPage />} />

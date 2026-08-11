@@ -285,10 +285,11 @@ export default function RequestOrderModal({ open, onClose, repId, onCreated }) {
               </div>
 
               <div className="p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm text-base-400">Total Order</span>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm text-base-400">Estimasi Subtotal</span>
                   <span className="text-xl font-extrabold text-base-100">{formatRupiah(total)}</span>
                 </div>
+                <div className="text-[11px] text-base-500 mb-3">Belum termasuk PPN — dihitung final oleh admin saat verifikasi</div>
                 <button
                   onClick={handleSubmit}
                   disabled={cartItems.length === 0 || submitting}

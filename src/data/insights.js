@@ -3,6 +3,7 @@ import { orders, TODAY } from './orders'
 import { outlets } from './outlets'
 import { products, isProductCritical } from './products'
 import { warehouses } from './warehouses'
+import { getTaxSummary } from './tax'
 import { formatRupiah } from '../lib/format'
 import { daysBetween } from '../lib/format'
 
@@ -91,6 +92,19 @@ function buildInsights() {
       title: 'Order Menunggu Verifikasi',
       message: `${pendingRequests.length} order dari sales rep menunggu diverifikasi sebelum dikirim.`,
       link: '/order',
+    })
+  }
+
+  // 6. PPN kurang bayar bulan berjalan
+  const currentPeriod = `${TODAY.getFullYear()}-${String(TODAY.getMonth() + 1).padStart(2, '0')}`
+  const taxSummary = getTaxSummary(currentPeriod)
+  if (taxSummary.selisih > 0) {
+    insights.push({
+      id: 'ins-tax-due',
+      type: 'warning',
+      title: 'PPN Kurang Bayar Bulan Ini',
+      message: `Pajak keluaran lebih besar ${formatRupiah(taxSummary.selisih)} dari pajak masukan bulan berjalan.`,
+      link: '/pajak',
     })
   }
 

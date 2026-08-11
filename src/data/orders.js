@@ -39,7 +39,7 @@ for (let i = 0; i < totalOrders; i++) {
   const itemCount = rng.int(2, 6)
   const usedProductIds = new Set()
   const items = []
-  let total = 0
+  let subtotal = 0
 
   for (let j = 0; j < itemCount; j++) {
     let product = rng.pick(products)
@@ -50,17 +50,22 @@ for (let i = 0; i < totalOrders; i++) {
     }
     usedProductIds.add(product.id)
     const qty = rng.pick([2, 3, 5, 5, 8, 10, 12, 20])
-    const subtotal = qty * product.harga
-    total += subtotal
+    const itemSubtotal = qty * product.harga
+    subtotal += itemSubtotal
     items.push({
       productId: product.id,
       nama: product.nama,
       satuan: product.satuan,
       qty,
       hargaSatuan: product.harga,
-      subtotal,
+      subtotal: itemSubtotal,
     })
   }
+
+  // mayoritas transaksi B2B distributor kena PPN, sebagian kecil non-PKP/bebas PPN
+  const kenaPPN = rng.bool(0.85)
+  const ppn = kenaPPN ? Math.round(subtotal * 0.11) : 0
+  const total = subtotal + ppn
 
   const termin = rng.pick(termOptions)
   const jatuhTempo = addDays(tanggal, termin)
@@ -90,6 +95,9 @@ for (let i = 0; i < totalOrders; i++) {
     salesRepId: outlet.salesRepId,
     warehouseId: warehouse.id,
     items,
+    kenaPPN,
+    subtotal,
+    ppn,
     total,
     status,
     suratJalanNumber: isSent ? `SJ-2026-${String(sjCounter++).padStart(4, '0')}` : null,
@@ -121,7 +129,7 @@ for (let i = 0; i < pendingRequestCount; i++) {
   const itemCount = rng.int(2, 4)
   const usedProductIds = new Set()
   const items = []
-  let total = 0
+  let subtotal = 0
 
   for (let j = 0; j < itemCount; j++) {
     let product = rng.pick(products)
@@ -132,17 +140,21 @@ for (let i = 0; i < pendingRequestCount; i++) {
     }
     usedProductIds.add(product.id)
     const qty = rng.pick([2, 3, 5, 8, 10])
-    const subtotal = qty * product.harga
-    total += subtotal
+    const itemSubtotal = qty * product.harga
+    subtotal += itemSubtotal
     items.push({
       productId: product.id,
       nama: product.nama,
       satuan: product.satuan,
       qty,
       hargaSatuan: product.harga,
-      subtotal,
+      subtotal: itemSubtotal,
     })
   }
+
+  const kenaPPN = rng.bool(0.85)
+  const ppn = kenaPPN ? Math.round(subtotal * 0.11) : 0
+  const total = subtotal + ppn
 
   const termin = rng.pick(termOptions)
   const jatuhTempo = addDays(tanggal, termin)
@@ -155,6 +167,9 @@ for (let i = 0; i < pendingRequestCount; i++) {
     salesRepId: outlet.salesRepId,
     warehouseId: warehouse.id,
     items,
+    kenaPPN,
+    subtotal,
+    ppn,
     total,
     status: 'diajukan',
     suratJalanNumber: null,
@@ -172,8 +187,10 @@ orders.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal))
 let runtimeOrderSeq = orderCounter
 let runtimeSjSeq = sjCounter
 
-export function createOrder({ outletId, salesRepId, warehouseId, items, termin = 7 }) {
-  const total = items.reduce((s, it) => s + it.subtotal, 0)
+export function createOrder({ outletId, salesRepId, warehouseId, items, termin = 7, kenaPPN = true }) {
+  const subtotal = items.reduce((s, it) => s + it.subtotal, 0)
+  const ppn = kenaPPN ? Math.round(subtotal * 0.11) : 0
+  const total = subtotal + ppn
   const tanggal = new Date()
   const jatuhTempo = addDays(tanggal, termin)
   const order = {
@@ -184,6 +201,9 @@ export function createOrder({ outletId, salesRepId, warehouseId, items, termin =
     salesRepId,
     warehouseId,
     items,
+    kenaPPN,
+    subtotal,
+    ppn,
     total,
     status: 'dikirim',
     suratJalanNumber: `SJ-2026-${String(runtimeSjSeq++).padStart(4, '0')}`,
@@ -199,8 +219,10 @@ export function createOrder({ outletId, salesRepId, warehouseId, items, termin =
 }
 
 // order request dari sales rep — masuk sebagai 'diajukan', menunggu admin verifikasi
-export function requestOrder({ outletId, salesRepId, warehouseId, items, termin = 7, catatan = '' }) {
-  const total = items.reduce((s, it) => s + it.subtotal, 0)
+export function requestOrder({ outletId, salesRepId, warehouseId, items, termin = 7, catatan = '', kenaPPN = true }) {
+  const subtotal = items.reduce((s, it) => s + it.subtotal, 0)
+  const ppn = kenaPPN ? Math.round(subtotal * 0.11) : 0
+  const total = subtotal + ppn
   const tanggal = new Date()
   const jatuhTempo = addDays(tanggal, termin)
   const order = {
@@ -211,6 +233,9 @@ export function requestOrder({ outletId, salesRepId, warehouseId, items, termin 
     salesRepId,
     warehouseId,
     items,
+    kenaPPN,
+    subtotal,
+    ppn,
     total,
     status: 'diajukan',
     suratJalanNumber: null,

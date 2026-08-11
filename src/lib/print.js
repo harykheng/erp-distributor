@@ -80,6 +80,12 @@ export function printInvoice(order, outlet) {
           </thead>
           <tbody>
             ${rows}
+            ${
+              order.kenaPPN
+                ? `<tr><td colspan="3" class="text-right">Subtotal</td><td class="text-right">${formatRupiah(order.subtotal)}</td></tr>
+                   <tr><td colspan="3" class="text-right">PPN (11%)</td><td class="text-right">${formatRupiah(order.ppn)}</td></tr>`
+                : ''
+            }
             <tr class="total-row"><td colspan="3" class="text-right">Total</td><td class="text-right">${formatRupiah(order.total)}</td></tr>
           </tbody>
         </table>
