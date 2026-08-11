@@ -5,7 +5,7 @@ import { outlets, createOutlet, setOutletStatus } from './outlets'
 import { salesReps } from './salesReps'
 import { products, totalStok, createProduct } from './products'
 import { warehouses } from './warehouses'
-import { orders, outletOrderHistory, outletProductAverages, createOrder, recordPayment, requestOrder, verifyOrderRequest } from './orders'
+import { orders, outletOrderHistory, outletProductAverages, createOrder, recordPayment, requestOrder, verifyOrderRequest, markAsShipped } from './orders'
 import { getReceivables, totalPiutang, piutangByBucket, piutangByOutlet, waReminderLink, agingBuckets } from './ar'
 import { returns } from './returns'
 import { mutations, mutationsByWarehouse } from './stockMutations'
@@ -68,6 +68,10 @@ export const api = {
   async verifyOrderRequest(orderId, approve) {
     await delay(200)
     return verifyOrderRequest(orderId, approve)
+  },
+  async markAsShipped(orderId) {
+    await delay(200)
+    return markAsShipped(orderId)
   },
   async getOutletHistory(outletId) {
     await delay()
