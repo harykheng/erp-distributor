@@ -12,6 +12,7 @@ const titles = {
   '/outlet': { title: 'Outlet / Customer', subtitle: 'Daftar toko dan warung pelanggan' },
   '/sales-rep': { title: 'Sales Rep', subtitle: 'Target, capaian, dan rute kunjungan' },
   '/produk': { title: 'Produk', subtitle: 'Katalog produk dan harga' },
+  '/pembelian': { title: 'Pembelian', subtitle: 'Catat pembelian dari supplier' },
   '/inventory': { title: 'Inventory / Gudang', subtitle: 'Stok per gudang, mutasi, dan retur barang' },
   '/laporan': { title: 'Laporan', subtitle: 'Rekap penjualan dan performa' },
   '/settings': { title: 'Settings', subtitle: 'Profil bisnis dan konfigurasi' },
