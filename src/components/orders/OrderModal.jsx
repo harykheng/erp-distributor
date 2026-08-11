@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Search, Store, Plus, Minus, Trash2, Truck, CheckCircle2, X, Sparkles } from 'lucide-react'
 import Modal from '../common/Modal'
+import Switch from '../common/Switch'
 import { useAppStore } from '../../store/useAppStore'
 import { outlets } from '../../data/outlets'
 import { products } from '../../data/products'
@@ -21,6 +22,7 @@ export default function OrderModal() {
   const [productQuery, setProductQuery] = useState('')
   const [cart, setCart] = useState({}) // productId -> qty
   const [warehouseId, setWarehouseId] = useState(warehouses[0].id)
+  const [kenaPPN, setKenaPPN] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(null)
 
@@ -30,6 +32,7 @@ export default function OrderModal() {
       setOutletQuery('')
       setProductQuery('')
       setCart({})
+      setKenaPPN(true)
       setSuccess(null)
       setSubmitting(false)
     }
@@ -63,7 +66,9 @@ export default function OrderModal() {
       const product = products.find((p) => p.id === productId)
       return { product, qty, subtotal: product.harga * qty }
     })
-  const total = cartItems.reduce((s, it) => s + it.subtotal, 0)
+  const subtotal = cartItems.reduce((s, it) => s + it.subtotal, 0)
+  const ppn = kenaPPN ? Math.round(subtotal * 0.11) : 0
+  const total = subtotal + ppn
 
   function setQty(productId, qty) {
     const clean = Number.isFinite(qty) ? Math.max(0, Math.floor(qty)) : 0
@@ -84,6 +89,7 @@ export default function OrderModal() {
       outletId,
       salesRepId: selectedOutlet.salesRepId,
       warehouseId,
+      kenaPPN,
       items: cartItems.map((it) => ({
         productId: it.product.id,
         nama: it.product.nama,
@@ -281,12 +287,32 @@ export default function OrderModal() {
                     ))}
                   </select>
                 </div>
+
+                <div className="mt-4 flex items-center justify-between bg-base-850 border border-base-700 rounded-xl px-4 py-3">
+                  <div>
+                    <div className="text-sm font-semibold text-base-200">Kena PPN</div>
+                    <div className="text-xs text-base-500">PPN 11% otomatis dihitung dari subtotal</div>
+                  </div>
+                  <Switch checked={kenaPPN} onChange={setKenaPPN} />
+                </div>
               </div>
 
               <div className="p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm text-base-400">Total Order</span>
-                  <span className="text-xl font-extrabold text-base-100">{formatRupiah(total)}</span>
+                <div className="space-y-1.5 mb-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-base-400">Subtotal</span>
+                    <span className="text-base-200 font-medium">{formatRupiah(subtotal)}</span>
+                  </div>
+                  {kenaPPN && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-base-400">PPN (11%)</span>
+                      <span className="text-base-200 font-medium">{formatRupiah(ppn)}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between border-t border-base-800 pt-1.5">
+                    <span className="text-sm text-base-400">Total Order</span>
+                    <span className="text-xl font-extrabold text-base-100">{formatRupiah(total)}</span>
+                  </div>
                 </div>
                 <button
                   onClick={handleSubmit}
@@ -324,6 +350,8 @@ function SuccessView({ order, outlet, onClose, onNew }) {
         <Row label="Nomor Order" value={order.nomor} />
         <Row label="Surat Jalan" value={order.suratJalanNumber} />
         <Row label="Jatuh Tempo" value={order.jatuhTempo} />
+        <Row label="Subtotal" value={formatRupiah(order.subtotal)} />
+        {order.kenaPPN && <Row label="PPN (11%)" value={formatRupiah(order.ppn)} />}
         <Row label="Total" value={formatRupiah(order.total)} />
       </div>
       <div className="flex gap-2 mt-6">

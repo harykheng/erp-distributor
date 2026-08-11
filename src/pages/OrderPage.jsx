@@ -160,6 +160,7 @@ export default function OrderPage() {
               <InfoRow label="Jatuh Tempo" value={formatDate(detail.jatuhTempo)} />
               <InfoRow label="Status" value={statusLabel[detail.status]} />
               <InfoRow label="Surat Jalan" value={detail.suratJalanNumber || '-'} />
+              <InfoRow label="Pajak" value={detail.kenaPPN ? 'Kena PPN 11%' : 'Non-PPN'} />
             </div>
             <div className="border-t border-base-800 pt-3">
               <div className="text-xs font-semibold text-base-400 uppercase tracking-wide mb-2">Item</div>
@@ -171,9 +172,21 @@ export default function OrderPage() {
                   </div>
                 ))}
               </div>
-              <div className="flex items-center justify-between border-t border-base-800 mt-3 pt-3">
-                <span className="text-sm font-semibold text-base-200">Total</span>
-                <span className="text-base font-extrabold text-base-100">{formatRupiah(detail.total)}</span>
+              <div className="border-t border-base-800 mt-3 pt-3 space-y-1.5">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-base-400">Subtotal</span>
+                  <span className="text-base-200 font-medium">{formatRupiah(detail.subtotal ?? detail.total)}</span>
+                </div>
+                {detail.kenaPPN && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-base-400">PPN (11%)</span>
+                    <span className="text-base-200 font-medium">{formatRupiah(detail.ppn)}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between border-t border-base-800 pt-1.5">
+                  <span className="text-sm font-semibold text-base-200">Total</span>
+                  <span className="text-base font-extrabold text-base-100">{formatRupiah(detail.total)}</span>
+                </div>
               </div>
             </div>
             {detail.suratJalanNumber && (

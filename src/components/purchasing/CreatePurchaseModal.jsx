@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Search, Package, Trash2, CheckCircle2, ShoppingBag } from 'lucide-react'
 import Modal from '../common/Modal'
+import Switch from '../common/Switch'
 import { products } from '../../data/products'
 import { warehouses } from '../../data/warehouses'
 import { suppliers } from '../../data/purchases'
@@ -18,6 +19,7 @@ export default function CreatePurchaseModal({ open, onClose, onCreated }) {
   const [cart, setCart] = useState({}) // productId -> { qty, hargaBeli }
   const [warehouseId, setWarehouseId] = useState(warehouses[0].id)
   const [tanggal, setTanggal] = useState(isoToday())
+  const [kenaPPN, setKenaPPN] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(null)
 
@@ -28,6 +30,7 @@ export default function CreatePurchaseModal({ open, onClose, onCreated }) {
       setCart({})
       setWarehouseId(warehouses[0].id)
       setTanggal(isoToday())
+      setKenaPPN(true)
       setSuccess(null)
       setSubmitting(false)
     }
@@ -57,7 +60,9 @@ export default function CreatePurchaseModal({ open, onClose, onCreated }) {
     const product = products.find((p) => p.id === productId)
     return { product, qty: v.qty, hargaBeli: v.hargaBeli, subtotal: v.qty * v.hargaBeli }
   })
-  const totalBiaya = cartItems.reduce((s, it) => s + it.subtotal, 0)
+  const subtotal = cartItems.reduce((s, it) => s + it.subtotal, 0)
+  const ppn = kenaPPN ? Math.round(subtotal * 0.11) : 0
+  const totalBiaya = subtotal + ppn
   const isValid = cartItems.length > 0 && cartItems.every((it) => it.qty > 0 && it.hargaBeli > 0)
 
   async function handleSubmit() {
@@ -67,6 +72,7 @@ export default function CreatePurchaseModal({ open, onClose, onCreated }) {
       supplier,
       warehouseId,
       tanggal,
+      kenaPPN,
       items: cartItems.map((it) => ({ productId: it.product.id, qty: it.qty, hargaBeli: it.hargaBeli })),
     }
     const created = await api.createPurchase(payload)
@@ -194,10 +200,30 @@ export default function CreatePurchaseModal({ open, onClose, onCreated }) {
             )}
           </div>
 
+          <div className="flex items-center justify-between bg-base-850 border border-base-700 rounded-xl px-4 py-3">
+            <div>
+              <div className="text-sm font-semibold text-base-200">Kena PPN</div>
+              <div className="text-xs text-base-500">PPN 11% dihitung otomatis dari subtotal — jadi basis pajak masukan</div>
+            </div>
+            <Switch checked={kenaPPN} onChange={setKenaPPN} />
+          </div>
+
           {cartItems.length > 0 && (
-            <div className="flex items-center justify-between bg-base-850 border border-base-700 rounded-xl px-4 py-3 text-sm">
-              <span className="text-base-400">Total Biaya</span>
-              <span className="font-bold text-base-100">{formatRupiah(totalBiaya)}</span>
+            <div className="bg-base-850 border border-base-700 rounded-xl px-4 py-3 text-sm space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-base-400">Subtotal</span>
+                <span className="text-base-200 font-medium">{formatRupiah(subtotal)}</span>
+              </div>
+              {kenaPPN && (
+                <div className="flex items-center justify-between">
+                  <span className="text-base-400">PPN (11%)</span>
+                  <span className="text-base-200 font-medium">{formatRupiah(ppn)}</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between border-t border-base-800 pt-1.5">
+                <span className="text-base-300 font-semibold">Total Biaya</span>
+                <span className="font-bold text-base-100">{formatRupiah(totalBiaya)}</span>
+              </div>
             </div>
           )}
 
@@ -217,6 +243,9 @@ export default function CreatePurchaseModal({ open, onClose, onCreated }) {
 
 function SuccessView({ purchases, onClose }) {
   const nomor = purchases[0].nomor
+  const kenaPPN = purchases[0].kenaPPN
+  const subtotal = purchases.reduce((s, p) => s + p.subtotal, 0)
+  const ppn = purchases.reduce((s, p) => s + p.ppn, 0)
   const totalBiaya = purchases.reduce((s, p) => s + p.totalBiaya, 0)
   return (
     <motion.div
@@ -239,6 +268,18 @@ function SuccessView({ purchases, onClose }) {
             <span className="text-base-100 font-medium shrink-0 ml-2">+{p.qty} {p.satuan}</span>
           </div>
         ))}
+        <div className="border-t border-base-800 pt-1.5 mt-1.5 space-y-1">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-base-500">Subtotal</span>
+            <span className="text-base-300">{formatRupiah(subtotal)}</span>
+          </div>
+          {kenaPPN && (
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-base-500">PPN (11%)</span>
+              <span className="text-base-300">{formatRupiah(ppn)}</span>
+            </div>
+          )}
+        </div>
       </div>
       <button onClick={onClose} className="mt-6 px-4 py-2.5 rounded-lg bg-brand text-ink text-sm font-bold hover:bg-brand-400">
         Selesai

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 
-export default function KpiCard({ label, value, sub, icon: Icon, accent = 'brand', trend }) {
+export default function KpiCard({ label, value, sub, icon: Icon, accent = 'brand', trend, valueClassName = '' }) {
   const accentClasses = {
     brand: 'text-brand bg-brand/10',
     good: 'text-good bg-good/10',
@@ -22,7 +22,7 @@ export default function KpiCard({ label, value, sub, icon: Icon, accent = 'brand
           </div>
         )}
       </div>
-      <div className="text-2xl md:text-3xl font-extrabold tracking-tight text-base-100 leading-none">
+      <div className={`text-2xl md:text-3xl font-extrabold tracking-tight leading-none ${valueClassName || 'text-base-100'}`}>
         {value}
       </div>
       {sub && (

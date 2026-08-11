@@ -13,6 +13,7 @@ import { transfers, createTransfer } from './transfers'
 import { mutations, mutationsByWarehouse, logReturnMutation, logPurchaseMutation, logTransferMutation } from './stockMutations'
 import { activityFeed } from './activity'
 import { getInsights, totalOutletAktif, totalStokKritis } from './insights'
+import { getTaxPeriods, getTaxSummary } from './tax'
 import { salesTrend30, penjualanBulanIni } from './salesTrend'
 import { repPerformance, ruteKunjungan } from './repPerformance'
 
@@ -128,6 +129,14 @@ export const api = {
     const transfer = createTransfer(payload)
     if (transfer) logTransferMutation(transfer)
     return transfer
+  },
+  async getTaxPeriods() {
+    await delay()
+    return getTaxPeriods()
+  },
+  async getTaxSummary(periodKey) {
+    await delay()
+    return getTaxSummary(periodKey)
   },
   async getActivityFeed() {
     await delay()

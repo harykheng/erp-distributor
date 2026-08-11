@@ -13,12 +13,14 @@ import {
   Settings,
   Boxes,
   ArrowUpRight,
+  Receipt,
 } from 'lucide-react'
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/order', label: 'Order / Penjualan', icon: ShoppingCart },
   { to: '/piutang', label: 'Piutang', icon: Wallet },
+  { to: '/pajak', label: 'Pajak (PPN)', icon: Receipt },
   { to: '/outlet', label: 'Outlet / Customer', icon: Store },
   { to: '/sales-rep', label: 'Sales Rep', icon: Users },
   { to: '/produk', label: 'Produk', icon: Package },

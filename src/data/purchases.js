@@ -36,6 +36,10 @@ for (let i = 0; i < purchaseCount; i++) {
   const daysAgo = rng.int(0, 59)
   const qty = rng.pick([20, 30, 50, 60, 100])
   const hargaBeli = product.hargaModal
+  const subtotal = qty * hargaBeli
+  // mayoritas pembelian dari supplier PKP kena PPN masukan, sebagian non-PPN
+  const kenaPPN = rng.bool(0.85)
+  const ppn = kenaPPN ? Math.round(subtotal * 0.11) : 0
   purchases.push({
     id: `pembelian-${i + 1}`,
     nomor: `PO-2026-${String(poCounter++).padStart(4, '0')}`,
@@ -46,7 +50,10 @@ for (let i = 0; i < purchaseCount; i++) {
     satuan: product.satuan,
     qty,
     hargaBeli,
-    totalBiaya: qty * hargaBeli,
+    kenaPPN,
+    subtotal,
+    ppn,
+    totalBiaya: subtotal + ppn,
     warehouseId: warehouse.id,
     status: 'diterima',
   })
@@ -56,8 +63,9 @@ purchases.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal))
 
 let runtimePurchaseSeq = purchaseCount + 1
 
-// Pembelian baru: satu PO bisa berisi beberapa item, langsung diterima & menambah stok gudang tujuan
-export function createPurchaseOrder({ supplier, warehouseId, tanggal, items }) {
+// Pembelian baru: satu PO bisa berisi beberapa item, langsung diterima & menambah stok gudang tujuan.
+// Toggle "Kena PPN" berlaku untuk satu PO (bukan per item), jadi jadi basis pajak masukan per PO.
+export function createPurchaseOrder({ supplier, warehouseId, tanggal, items, kenaPPN = true }) {
   if (!items || items.length === 0) return null
 
   const nomor = `PO-2026-${String(purchaseCount + runtimePurchaseSeq).padStart(4, '0')}`
@@ -67,6 +75,9 @@ export function createPurchaseOrder({ supplier, warehouseId, tanggal, items }) {
   for (const item of items) {
     const product = products.find((p) => p.id === item.productId)
     if (!product) continue
+
+    const subtotal = item.qty * item.hargaBeli
+    const ppn = kenaPPN ? Math.round(subtotal * 0.11) : 0
 
     const purchase = {
       id: `pembelian-runtime-${runtimePurchaseSeq}`,
@@ -78,7 +89,10 @@ export function createPurchaseOrder({ supplier, warehouseId, tanggal, items }) {
       satuan: product.satuan,
       qty: item.qty,
       hargaBeli: item.hargaBeli,
-      totalBiaya: item.qty * item.hargaBeli,
+      kenaPPN,
+      subtotal,
+      ppn,
+      totalBiaya: subtotal + ppn,
       warehouseId,
       status: 'diterima',
     }
