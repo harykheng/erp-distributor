@@ -7,6 +7,7 @@ import OutletPage from './pages/OutletPage'
 import OutletDetailPage from './pages/OutletDetailPage'
 import SalesRepPage from './pages/SalesRepPage'
 import SalesAppPage from './pages/SalesAppPage'
+import ProductPage from './pages/ProductPage'
 import InventoryPage from './pages/InventoryPage'
 import LaporanPage from './pages/LaporanPage'
 import SettingsPage from './pages/SettingsPage'
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/outlet" element={<OutletPage />} />
         <Route path="/outlet/:id" element={<OutletDetailPage />} />
         <Route path="/sales-rep" element={<SalesRepPage />} />
+        <Route path="/produk" element={<ProductPage />} />
         <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/laporan" element={<LaporanPage />} />
         <Route path="/settings" element={<SettingsPage />} />

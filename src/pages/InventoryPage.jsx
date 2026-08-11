@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, Package, ArrowDownToLine, ArrowUpFromLine, Undo2, Plus, Warehouse as WarehouseIcon } from 'lucide-react'
+import { AlertTriangle, Package, ArrowDownToLine, ArrowUpFromLine, Undo2, Warehouse as WarehouseIcon } from 'lucide-react'
 import { api } from '../data/api'
 import { warehouses } from '../data/warehouses'
 import { isProductCritical } from '../data/products'
@@ -7,7 +7,6 @@ import { useAppStore } from '../store/useAppStore'
 import DataTable from '../components/common/DataTable'
 import Badge from '../components/common/Badge'
 import KpiCard from '../components/common/KpiCard'
-import AddProductModal from '../components/inventory/AddProductModal'
 import CreateReturnModal from '../components/inventory/CreateReturnModal'
 import { formatRupiah, formatDate } from '../lib/format'
 
@@ -33,7 +32,6 @@ export default function InventoryPage() {
   const [mutations, setMutations] = useState([])
   const [returns, setReturns] = useState([])
   const [whFilter, setWhFilter] = useState('semua')
-  const [addProductOpen, setAddProductOpen] = useState(false)
   const [createReturnOpen, setCreateReturnOpen] = useState(false)
 
   useEffect(() => {
@@ -154,19 +152,12 @@ export default function InventoryPage() {
             </button>
           ))}
         </div>
-        {tab === 'retur' ? (
+        {tab === 'retur' && (
           <button
             onClick={() => setCreateReturnOpen(true)}
             className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-brand text-ink text-sm font-bold hover:bg-brand-400 shadow-card"
           >
             <Undo2 size={16} strokeWidth={2.5} /> Buat Retur
-          </button>
-        ) : (
-          <button
-            onClick={() => setAddProductOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-brand text-ink text-sm font-bold hover:bg-brand-400 shadow-card"
-          >
-            <Plus size={16} strokeWidth={2.5} /> Tambah Produk
           </button>
         )}
       </div>
@@ -196,14 +187,6 @@ export default function InventoryPage() {
         <DataTable columns={returColumns} data={returns} searchKeys={['nomor', 'outletNama', 'productNama']} searchPlaceholder="Cari retur, outlet, atau produk..." pageSize={12} />
       )}
 
-      <AddProductModal
-        open={addProductOpen}
-        onClose={() => setAddProductOpen(false)}
-        onCreated={() => {
-          setAddProductOpen(false)
-          bumpDataVersion()
-        }}
-      />
       <CreateReturnModal
         open={createReturnOpen}
         onClose={() => setCreateReturnOpen(false)}
