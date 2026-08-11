@@ -8,7 +8,7 @@ import { warehouses } from './warehouses'
 import { orders, outletOrderHistory, outletProductAverages, createOrder, recordPayment, requestOrder, verifyOrderRequest, markAsShipped } from './orders'
 import { getReceivables, totalPiutang, piutangByBucket, piutangByOutlet, waReminderLink, agingBuckets } from './ar'
 import { returns, createReturn } from './returns'
-import { purchases, suppliers, createPurchase } from './purchases'
+import { purchases, suppliers, createPurchaseOrder } from './purchases'
 import { transfers, createTransfer } from './transfers'
 import { mutations, mutationsByWarehouse, logReturnMutation, logPurchaseMutation, logTransferMutation } from './stockMutations'
 import { activityFeed } from './activity'
@@ -115,9 +115,9 @@ export const api = {
   },
   async createPurchase(payload) {
     await delay(200)
-    const purchase = createPurchase(payload)
-    if (purchase) logPurchaseMutation(purchase)
-    return purchase
+    const items = createPurchaseOrder(payload)
+    if (items) items.forEach((purchase) => logPurchaseMutation(purchase))
+    return items
   },
   async getTransfers() {
     await delay()
