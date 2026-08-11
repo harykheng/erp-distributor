@@ -9,7 +9,8 @@ import { orders, outletOrderHistory, outletProductAverages, createOrder, recordP
 import { getReceivables, totalPiutang, piutangByBucket, piutangByOutlet, waReminderLink, agingBuckets } from './ar'
 import { returns, createReturn } from './returns'
 import { purchases, suppliers, createPurchase } from './purchases'
-import { mutations, mutationsByWarehouse, logReturnMutation, logPurchaseMutation } from './stockMutations'
+import { transfers, createTransfer } from './transfers'
+import { mutations, mutationsByWarehouse, logReturnMutation, logPurchaseMutation, logTransferMutation } from './stockMutations'
 import { activityFeed } from './activity'
 import { getInsights, totalOutletAktif, totalStokKritis } from './insights'
 import { salesTrend30, penjualanBulanIni } from './salesTrend'
@@ -117,6 +118,16 @@ export const api = {
     const purchase = createPurchase(payload)
     if (purchase) logPurchaseMutation(purchase)
     return purchase
+  },
+  async getTransfers() {
+    await delay()
+    return transfers
+  },
+  async createTransfer(payload) {
+    await delay(200)
+    const transfer = createTransfer(payload)
+    if (transfer) logTransferMutation(transfer)
+    return transfer
   },
   async getActivityFeed() {
     await delay()

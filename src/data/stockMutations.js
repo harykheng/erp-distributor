@@ -1,6 +1,7 @@
 import { orders } from './orders'
 import { returns } from './returns'
 import { purchases } from './purchases'
+import { transfers } from './transfers'
 
 export const mutations = []
 let mCounter = 1
@@ -38,6 +39,34 @@ purchases.forEach((p) => {
     warehouseId: p.warehouseId,
     keterangan: `Pembelian dari ${p.supplier}`,
     refNomor: p.nomor,
+  })
+})
+
+// transfer: perpindahan stok antar gudang, dicatat dua sisi
+transfers.forEach((t) => {
+  mutations.push({
+    id: `mut-${mCounter++}`,
+    tanggal: t.tanggal,
+    jenis: 'transfer',
+    productId: t.productId,
+    productNama: t.productNama,
+    satuan: t.satuan,
+    qty: t.qty,
+    warehouseId: t.fromWarehouseId,
+    keterangan: `Transfer keluar ke ${t.toWarehouseNama}`,
+    refNomor: t.nomor,
+  })
+  mutations.push({
+    id: `mut-${mCounter++}`,
+    tanggal: t.tanggal,
+    jenis: 'transfer',
+    productId: t.productId,
+    productNama: t.productNama,
+    satuan: t.satuan,
+    qty: t.qty,
+    warehouseId: t.toWarehouseId,
+    keterangan: `Transfer masuk dari ${t.fromWarehouseNama}`,
+    refNomor: t.nomor,
   })
 })
 
@@ -90,5 +119,32 @@ export function logPurchaseMutation(purchase) {
     warehouseId: purchase.warehouseId,
     keterangan: `Pembelian dari ${purchase.supplier}`,
     refNomor: purchase.nomor,
+  })
+}
+
+export function logTransferMutation(transfer) {
+  mutations.unshift({
+    id: `mut-${mCounter++}`,
+    tanggal: transfer.tanggal,
+    jenis: 'transfer',
+    productId: transfer.productId,
+    productNama: transfer.productNama,
+    satuan: transfer.satuan,
+    qty: transfer.qty,
+    warehouseId: transfer.toWarehouseId,
+    keterangan: `Transfer masuk dari ${transfer.fromWarehouseNama}`,
+    refNomor: transfer.nomor,
+  })
+  mutations.unshift({
+    id: `mut-${mCounter++}`,
+    tanggal: transfer.tanggal,
+    jenis: 'transfer',
+    productId: transfer.productId,
+    productNama: transfer.productNama,
+    satuan: transfer.satuan,
+    qty: transfer.qty,
+    warehouseId: transfer.fromWarehouseId,
+    keterangan: `Transfer keluar ke ${transfer.toWarehouseNama}`,
+    refNomor: transfer.nomor,
   })
 }
