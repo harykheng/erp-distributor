@@ -8,6 +8,7 @@ import DataTable from '../components/common/DataTable'
 import Badge from '../components/common/Badge'
 import KpiCard from '../components/common/KpiCard'
 import AddProductModal from '../components/inventory/AddProductModal'
+import CreateReturnModal from '../components/inventory/CreateReturnModal'
 import { formatRupiah, formatDate } from '../lib/format'
 
 const tabs = [
@@ -33,6 +34,7 @@ export default function InventoryPage() {
   const [returns, setReturns] = useState([])
   const [whFilter, setWhFilter] = useState('semua')
   const [addProductOpen, setAddProductOpen] = useState(false)
+  const [createReturnOpen, setCreateReturnOpen] = useState(false)
 
   useEffect(() => {
     api.getProducts().then(setProducts)
@@ -152,12 +154,21 @@ export default function InventoryPage() {
             </button>
           ))}
         </div>
-        <button
-          onClick={() => setAddProductOpen(true)}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-brand text-ink text-sm font-bold hover:bg-brand-400 shadow-card"
-        >
-          <Plus size={16} strokeWidth={2.5} /> Tambah Produk
-        </button>
+        {tab === 'retur' ? (
+          <button
+            onClick={() => setCreateReturnOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-brand text-ink text-sm font-bold hover:bg-brand-400 shadow-card"
+          >
+            <Undo2 size={16} strokeWidth={2.5} /> Buat Retur
+          </button>
+        ) : (
+          <button
+            onClick={() => setAddProductOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-brand text-ink text-sm font-bold hover:bg-brand-400 shadow-card"
+          >
+            <Plus size={16} strokeWidth={2.5} /> Tambah Produk
+          </button>
+        )}
       </div>
 
       {tab === 'stok' && (
@@ -192,6 +203,11 @@ export default function InventoryPage() {
           setAddProductOpen(false)
           bumpDataVersion()
         }}
+      />
+      <CreateReturnModal
+        open={createReturnOpen}
+        onClose={() => setCreateReturnOpen(false)}
+        onCreated={() => bumpDataVersion()}
       />
     </div>
   )
